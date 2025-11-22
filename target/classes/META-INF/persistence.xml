@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <persistence-unit name="TattooPU" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/TattooStudioManagement</jta-data-source>
+    <!--<exclude-unlisted-classes>false</exclude-unlisted-classes>-->
+    <class>entities.Announcement</class>
+    <class>entities.AppUser</class>
+    <class>entities.Appointment</class>
+    <class>entities.ArtistPayout</class>
+    <class>entities.ArtistSchedule</class>
+    <class>entities.DesignFavourite</class>
+    <class>entities.DesignLike</class>
+    <class>entities.EarningLog</class>
+    <class>entities.Experience</class>
+    <class>entities.Feedback</class>
+    <class>entities.GroupMaster</class>
+    <class>entities.LoginHistory</class>
+    <class>entities.MedicalForm</class>
+    <class>entities.Payment</class>
+    <class>entities.Review</class>
+    <class>entities.TattooDesign</class>
+    <class>entities.TimeSlot</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+    </properties>
+  </persistence-unit>
+</persistence>
