@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Login to InkFlow | Studio Management</title>
+        <!-- Google Fonts: Playfair Display for Headers, Lato for Body -->
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet" />
+        
+        <style>
+            :root {
+                /* Color variables matching register.xhtml */
+                --bg-cream: #fdfbf7;
+                --card-white: #ffffff;
+                --ink-black: #2d2d2d;
+                --ink-light: #4a4a4a;
+                --gold-accent: #c5a059;
+                --gold-light: #f3e9d2;
+                --error-red: #d32f2f;
+                --border-color: #e0e0e0;
+            }
+
+            body {
+                background-color: var(--bg-cream);
+                font-family: 'Lato', sans-serif;
+                margin: 0;
+                padding: 0;
+                color: var(--ink-light);
+                background-image: radial-gradient(#e6e6e6 1px, transparent 1px);
+                background-size: 20px 20px; /* Subtle texture */
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .login-container {
+                width: 100%;
+                max-width: 450px; /* Slightly narrower than registration for focus */
+                padding: 20px;
+            }
+
+            .login-card {
+                background: var(--card-white);
+                border: 1px solid rgba(0,0,0,0.05);
+                border-radius: 4px; 
+                box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+                padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Top accent bar representing "Ink" */
+            .login-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, var(--ink-black), var(--gold-accent));
+            }
+
+            .header-section {
+                text-align: center;
+                margin-bottom: 35px;
+            }
+
+            .app-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--ink-black);
+                margin: 0;
+                letter-spacing: -0.5px;
+            }
+
+            .app-subtitle {
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: var(--gold-accent);
+                margin-top: 5px;
+                font-weight: 700;
+            }
+
+            /* Form Styles */
+            .form-group {
+                margin-bottom: 25px;
+            }
+
+            .form-label {
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 700;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--ink-black);
+            }
+
+            /* Overriding PrimeFaces Input Styles for Aesthetic */
+            body .ui-inputfield {
+                width: 100%;
+                background: #fcfcfc;
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                border-radius: 0; 
+                border-bottom: 2px solid var(--border-color);
+                box-shadow: none !important;
+                transition: all 0.3s ease;
+                font-family: 'Lato', sans-serif;
+            }
+
+            body .ui-inputfield:focus {
+                background: #fff;
+                border-bottom-color: var(--gold-accent) !important;
+                border-color: var(--border-color);
+            }
+            
+            body .ui-password {
+                width: 100%;
+            }
+
+            /* Button Styling */
+            body .ui-button {
+                background: var(--ink-black) !important;
+                border: none !important;
+                color: #fff !important;
+                font-family: 'Lato', sans-serif;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                padding: 10px 0;
+                height: 50px;
+                border-radius: 0;
+                transition: background 0.3s;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            body .ui-button:hover {
+                background: var(--gold-accent) !important;
+                color: var(--ink-black) !important;
+            }
+
+            /* Links */
+            .register-link {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.9rem;
+            }
+
+            .register-link a {
+                color: var(--gold-accent);
+                text-decoration: none;
+                font-weight: 700;
+                border-bottom: 1px dotted var(--gold-accent);
+                transition: all 0.2s;
+            }
+
+            .register-link a:hover {
+                color: var(--ink-black);
+                border-bottom-style: solid;
+            }
+            
+            /* Messages */
+            body .ui-messages .ui-messages-error {
+                background-color: #fce4e4;
+                color: var(--error-red);
+                border: none;
+                border-left: 4px solid var(--error-red);
+            }
+            
+            /* Input Group Addon (Icon inside input) */
+            body .ui-inputgroup-addon {
+                background: transparent;
+                border: none;
+                border-bottom: 2px solid var(--border-color);
+                color: var(--gold-accent);
+                padding-top: 15px;
+            }
+        </style>
+    </h:head>
+
+    <h:body>
+        <div class="login-container">
+            <div class="login-card">
+                
+                <div class="header-section">
+                    <h1 class="app-title">InkFlow</h1>
+                    <div class="app-subtitle">Welcome Back</div>
+                </div>
+
+                <!-- Global Messages - crucial for displaying login errors, verification messages, etc. -->
+                <p:messages id="msgs" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+
+                <h:form id="loginForm">
+                    
+                    <!-- 1. Username/Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username or Email</label>
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon"><i class="pi pi-user"></i></span>
+                            <p:inputText id="username" 
+                                         value="#{loginBean.loginDTO.username}" 
+                                         required="true" 
+                                         requiredMessage="Username or Email is required"
+                                         placeholder="Your username or email" />
+                        </div>
+                        <p:message for="username" display="text" />
+                    </div>
+
+                    <!-- 2. Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon"><i class="pi pi-lock"></i></span>
+                            <p:password id="password" 
+                                        value="#{loginBean.loginDTO.password}" 
+                                        required="true" 
+                                        requiredMessage="Password is required"
+                                        feedback="false" 
+                                        placeholder="Your secret password" />
+                        </div>
+                        <p:message for="password" display="text" />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <p:commandButton value="Sign In" 
+                 action="#{loginBean.login}" 
+                 ajax="false"
+                 />
+
+
+                </h:form>
+
+                <div class="register-link">
+                    New to InkFlow? <a href="register.xhtml">Create an Account</a>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>

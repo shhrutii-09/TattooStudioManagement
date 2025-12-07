@@ -1,5 +1,6 @@
 package ejb;
 
+import dto.AdminProfileDTO;
 import entities.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +15,10 @@ public interface AdminEJBLocal {
     AppUser getUserById(Long userId);
     void deactivateUser(Long userId, boolean deactivate, String reason);
     void verifyArtist(Long artistId, boolean verify, Long verifyingAdminId);
+ 
 
+    Long getUserIdByUsername(String username);
+    
     // -------- Announcements --------
     Announcement createAnnouncement(Long postedByAdminId, String title, String message, String targetRole);
     Announcement updateAnnouncement(Long announcementId, String title, String message, String targetRole);
@@ -64,4 +68,28 @@ public interface AdminEJBLocal {
     // -------- Medical Forms --------
     List<MedicalForm> listMedicalForms(int offset, int limit);
     void approveMedicalForm(Integer formId, Long adminId);
+    
+    
+    
+    //additionally added
+    long countTotalUsers();
+long countTotalArtists();
+long countTotalClients();
+long countTotalBookings();
+long countTodaysAppointments();
+
+// Recent activity
+List<Appointment> listRecentAppointments(int limit);
+
+// New Method Signature
+double calculateTotalEarnings(); // Or use BigDecimal for better currency handling
+
+AdminProfileDTO getAdminProfile(Long adminId);
+boolean updateAdminDetails(AdminProfileDTO dto);
+boolean changeAdminPassword(Long adminId, String oldPassword, String newPassword);
+
+void deleteUser(Long userId);
+
+List<AppUser> listArtists();
+
 }

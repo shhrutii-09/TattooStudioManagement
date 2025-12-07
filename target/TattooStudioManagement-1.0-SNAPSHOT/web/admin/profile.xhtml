@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Manage Profile</ui:define>
+    <ui:define name="pageTitle">Manage Profile</ui:define>
+
+    <ui:define name="content">
+        <h:form id="profileForm">
+            <!-- ✅ Growl at the top -->
+            <p:growl id="growl" showDetail="true" life="4000" />
+
+            <div class="profile-container">
+                <!-- Account Details -->
+                <div class="profile-section">
+                    <h2>Account Details</h2>
+                    <p:panelGrid columns="2" columnClasses="label-col,value-col" styleClass="profile-grid">
+                        <h:outputLabel for="fullName" value="Full Name:" />
+                        <p:inputText id="fullName" value="#{adminProfileBean.profile.fullName}" required="true" styleClass="wide-input" />
+
+                        <h:outputLabel for="email" value="Email:" />
+                        <p:inputText id="email" value="#{adminProfileBean.profile.email}" required="true" styleClass="wide-input" />
+
+                        <h:outputLabel for="phone" value="Phone:" />
+                        <p:inputText id="phone" value="#{adminProfileBean.profile.phone}" styleClass="wide-input" />
+
+                        <h:outputLabel for="username" value="Username:" />
+                        <p:inputText id="username" value="#{adminProfileBean.profile.username}" required="true" styleClass="wide-input" />
+
+                        <h:outputLabel value="Role:" />
+                        <h:outputText value="#{adminProfileBean.profile.role}" />
+                    </p:panelGrid>
+
+                    <p:commandButton value="Update Profile"
+                                     actionListener="#{adminProfileBean.saveDetails}"
+                                     update="profileForm growl"
+                                     styleClass="btn-primary" />
+                </div>
+
+                <!-- Password Change -->
+                <div class="profile-section">
+                    <h2>Change Password</h2>
+                    <p:panelGrid columns="2" columnClasses="label-col,value-col" styleClass="profile-grid">
+                        <h:outputLabel for="oldPass" value="Old Password:" />
+                        <p:password id="oldPass" value="#{adminProfileBean.oldPassword}" styleClass="wide-input" />
+
+                        <h:outputLabel for="newPass" value="New Password:" />
+                        <p:password id="newPass" value="#{adminProfileBean.newPassword}"  styleClass="wide-input" />
+                    </p:panelGrid>
+
+                    <p:commandButton value="Change Password"
+                                     actionListener="#{adminProfileBean.updatePassword}"
+                                     update="profileForm growl"
+                                     styleClass="btn-primary" />
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,4 +1,5 @@
 package ejb;
+import dto.AdminProfileDTO;
 import jakarta.persistence.NoResultException;
 import java.time.LocalDateTime;
 import entities.*;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import util.PasswordUtil;
 
 @Stateless
 //@RolesAllowed({"ADMIN"})
@@ -27,10 +29,12 @@ public class AdminEJB implements AdminEJBLocal {
     // User Management
     // -----------------------
     @Override
-    public List<AppUser> listAllUsers() {
-        return em.createQuery("SELECT u FROM AppUser u ORDER BY u.createdAt DESC", AppUser.class)
-                 .getResultList();
-    }
+public List<AppUser> listAllUsers() {
+    return em.createQuery(
+            "SELECT u FROM AppUser u WHERE u.role.roleName <> 'ADMIN' ORDER BY u.userId ASC",
+            AppUser.class
+    ).getResultList();
+}
 
     private AppUser findUser(Long userId) {
     if (userId == null) {
@@ -65,17 +69,20 @@ public AppUser getUserById(Long userId) {
         em.merge(u);
     }
 
-  @Override
+ @Override
 @Transactional
 public void verifyArtist(Long artistId, boolean verify, Long verifyingAdminId) {
-    AppUser artist = findUser(artistId); // Uses helper
-    
-    findUser(verifyingAdminId); // Validate that the admin performing the action exists
-    
+    AppUser artist = findUser(artistId);
+
+    // Only validate admin ID if provided
+    if (verifyingAdminId != null) {
+        findUser(verifyingAdminId);
+    }
+
     artist.setIsVerified(verify);
-    
     em.merge(artist);
 }
+
     // Ensure user is ARTIST
 //    GroupMaster role = user.getRole();
 //    if (role == null || role.getRoleName() == null 
@@ -95,6 +102,19 @@ public void verifyArtist(Long artistId, boolean verify, Long verifyingAdminId) {
 //    }
 //}
 
+@Override
+    public Long getUserIdByUsername(String username) {
+        try {
+            // Find the ID of the user based on their unique username
+            return em.createQuery("SELECT u.userId FROM AppUser u WHERE u.username = :username", Long.class)
+                     .setParameter("username", username)
+                     .getSingleResult();
+        } catch (NoResultException e) {
+            // This should theoretically not happen if the JWT is valid, 
+            // but it's good practice to handle the possibility.
+            throw new IllegalArgumentException("Authenticated user not found in database: " + username);
+        }
+    }
 
     // -----------------------
     // Announcements
@@ -290,8 +310,7 @@ public EarningLog logEarningsForPayment(Integer paymentId) {
     
     return log;
 }
-    
-    
+     
     @Override
 public List<Payment> listPayments(int offset, int limit) {
     TypedQuery<Payment> q = em.createQuery("SELECT p FROM Payment p ORDER BY p.paymentDate DESC", Payment.class);
@@ -537,4 +556,153 @@ public Map<String, Object> generateSimpleReports(LocalDate fromDate, LocalDate t
 
         em.merge(form);
     }
+    
+    
+    //additionally added things
+    @Override
+public long countTotalUsers() {
+    return em.createQuery("SELECT COUNT(u) FROM AppUser u", Long.class)
+             .getSingleResult();
+}
+
+@Override
+public long countTotalArtists() {
+    return em.createQuery("SELECT COUNT(u) FROM AppUser u WHERE u.role.roleName = 'ARTIST'", Long.class)
+             .getSingleResult();
+}
+
+@Override
+public long countTotalClients() {
+    return em.createQuery("SELECT COUNT(u) FROM AppUser u WHERE u.role.roleName = 'CLIENT'", Long.class)
+             .getSingleResult();
+}
+
+@Override
+public long countTotalBookings() {
+    return em.createQuery("SELECT COUNT(a) FROM Appointment a", Long.class)
+             .getSingleResult();
+}
+
+@Override
+public long countTodaysAppointments() {
+    LocalDate today = LocalDate.now();
+    LocalDateTime start = today.atStartOfDay();
+    LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+    return em.createQuery(
+            "SELECT COUNT(a) FROM Appointment a WHERE a.appointmentDateTime >= :start AND a.appointmentDateTime < :end",
+            Long.class)
+            .setParameter("start", start)
+            .setParameter("end", end)
+            .getSingleResult();
+}
+
+@Override
+public List<Appointment> listRecentAppointments(int limit) {
+    return em.createQuery(
+            "SELECT a FROM Appointment a ORDER BY a.appointmentDateTime DESC",
+            Appointment.class)
+            .setMaxResults(limit)
+            .getResultList();
+}
+
+
+@Override
+public double calculateTotalEarnings() {
+    // Assuming you have an entity called 'Payment' with a 'paymentAmount' field
+    // and a 'status' field to filter only successful transactions (e.g., 'PAID' or 'COMPLETED').
+    try {
+        Double result = em.createQuery(
+                "SELECT SUM(p.paymentAmount) FROM Payment p WHERE p.status = 'COMPLETED'",
+                Double.class)
+                .getSingleResult();
+        return result != null ? result : 0.0;
+    } catch (NoResultException e) {
+        return 0.0;
+    } catch (Exception e) {
+        // Log the exception
+        return 0.0; // Return zero on error
+    }
+}
+
+// AdminEJB.java
+@Override
+public AdminProfileDTO getAdminProfile(Long adminId) {
+    AppUser admin = em.find(AppUser.class, adminId);
+    if (admin == null) return null;
+
+    AdminProfileDTO dto = new AdminProfileDTO();
+    dto.setUserId(admin.getUserId());
+    dto.setUsername(admin.getUsername());
+    dto.setFullName(admin.getFullName());
+    dto.setEmail(admin.getEmail());
+    dto.setPhone(admin.getPhone());
+    if (admin.getRole() != null) dto.setRole(admin.getRole().getRoleName());
+    return dto;
+}
+
+@Override
+public boolean updateAdminDetails(AdminProfileDTO dto) {
+    try {
+        AppUser admin = em.find(AppUser.class, dto.getUserId());
+        if (admin == null) return false;
+
+        admin.setUsername(dto.getUsername());   // add this line
+        admin.setFullName(dto.getFullName());
+        admin.setEmail(dto.getEmail());
+        admin.setPhone(dto.getPhone());
+        // role remains unchanged
+        em.merge(admin);
+        return true;
+    } catch (Exception e) {
+        // log e
+        return false;
+    }
+}
+
+@Override
+public boolean changeAdminPassword(Long adminId, String oldPassword, String newPassword) {
+    try {
+        AppUser admin = em.find(AppUser.class, adminId);
+        if (admin == null) return false;
+
+        // ✅ Verify old password using PasswordUtil
+        if (!PasswordUtil.verifyPassword(oldPassword, admin.getPassword())) {
+            return false; // old password doesn’t match
+        }
+
+        // ✅ Hash new password before saving
+        String hashedNewPassword = PasswordUtil.hashPassword(newPassword);
+        admin.setPassword(hashedNewPassword);
+
+        em.merge(admin);
+        return true;
+    } catch (Exception e) {
+        // log error
+        return false;
+    }
+}
+
+
+@Override
+@Transactional
+public void deleteUser(Long userId) {
+    AppUser u = em.find(AppUser.class, userId);
+    if (u == null) {
+        throw new IllegalArgumentException("User not found: " + userId);
+    }
+    em.remove(u);
+}
+
+// AdminEJB.java
+
+@Override
+public List<AppUser> listArtists() {
+    return em.createQuery(
+        "SELECT u FROM AppUser u WHERE u.role.roleName = 'ARTIST' ORDER BY u.userId ASC",
+        AppUser.class
+    ).getResultList();
+}
+
+
 }

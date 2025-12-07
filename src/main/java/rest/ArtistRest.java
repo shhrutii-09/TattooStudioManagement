@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import jakarta.annotation.security.RolesAllowed;
 
 @Path("/artist")
+@RolesAllowed({"ADMIN", "ARTIST"})
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ArtistRest {
@@ -596,21 +598,21 @@ public Response setArtistSchedule(@PathParam("id") Long artistId, ArtistSchedule
     // -----------------------
     // Payments & earnings
     // -----------------------
-   @GET
-@Path("/{id}/payments") // This path is now unique for listing payments
-public Response listPaymentsForArtist(@PathParam("id") Long artistId,
-                                      @QueryParam("offset") @DefaultValue("0") int offset,
-                                      @QueryParam("limit") @DefaultValue("50") int limit) {
-    try {
-        // Calls the correct EJB method
-        List<Payment> payments = artistEJB.listPaymentsForArtist(artistId, offset, limit);
-        return Response.ok(payments).build();
-    } catch (Exception ex) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity(Map.of("error", getBusinessMessage(ex)))
-                .build();
+    @GET
+    @Path("/{id}/payments") // This path is now unique for listing payments
+    public Response listPaymentsForArtist(@PathParam("id") Long artistId,
+                                          @QueryParam("offset") @DefaultValue("0") int offset,
+                                          @QueryParam("limit") @DefaultValue("50") int limit) {
+        try {
+            // Calls the correct EJB method
+            List<Payment> payments = artistEJB.listPaymentsForArtist(artistId, offset, limit);
+            return Response.ok(payments).build();
+        } catch (Exception ex) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(Map.of("error", getBusinessMessage(ex)))
+                    .build();
+        }
     }
-}
     
     @GET
     @Path("/{id}/earnings/logs")

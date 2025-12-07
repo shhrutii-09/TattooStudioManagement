@@ -11,15 +11,22 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import jakarta.annotation.security.RolesAllowed; // <-- Ensure this is imported!
+import jakarta.ws.rs.core.SecurityContext;
 
 @Path("/admin")
 //@RolesAllowed({"ADMIN"})
+@RolesAllowed("ADMIN")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AdminRest {
 
+    
+    
+    
     @EJB
     private AdminEJBLocal adminEJB;
+    @Context private SecurityContext securityContext;
 
     // Helper to safely get the original business message from a potentially wrapped exception
     private String getBusinessMessage(Exception e) {
@@ -466,19 +473,22 @@ public Response generateReports(@QueryParam("from") String fromDateStr, @QueryPa
     }
 
    @POST
-@Path("/medical-forms/{id}/approve")
-public Response approveMedicalForm(@PathParam("id") Integer formId, Map<String, Object> data) { 
-    try {
-        // Must extract adminId from body for EJB logic validation
-        Long adminId = data.get("adminId") != null ? Long.parseLong(data.get("adminId").toString()) : null; 
-        
-        adminEJB.approveMedicalForm(formId, adminId);
-        return Response.ok(Map.of("success", true, "message", "Medical form approved.")).build();
-    } catch (Exception ex) { 
-        String message = getBusinessMessage(ex);
-        return Response.status(Response.Status.NOT_FOUND)
-                       .entity(Map.of("message", message))
-                       .build();
+    @Path("/medical-forms/{id}/approve")
+    public Response approveMedicalForm(@PathParam("id") Integer formId) { 
+        try {
+            // 1. SECURELY retrieve the authenticated username from the JWT/SecurityContext
+            String username = securityContext.getUserPrincipal().getName(); 
+            
+            // 2. Look up the Admin's ID using the username (The EJB method we need to create)
+            Long adminId = adminEJB.getUserIdByUsername(username); 
+
+            adminEJB.approveMedicalForm(formId, adminId);
+            return Response.ok(Map.of("success", true, "message", "Medical form approved.")).build();
+        } catch (Exception ex) { 
+            String message = getBusinessMessage(ex);
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity(Map.of("message", message))
+                           .build();
+        }
     }
-}
 }

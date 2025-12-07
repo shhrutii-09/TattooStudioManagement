@@ -8,6 +8,8 @@ import jakarta.ws.rs.core.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.time.LocalDate;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * ClientREST - complete client API for Tattoo Studio Management
@@ -15,6 +17,7 @@ import java.time.LocalDate;
  * Error format: { "error": "message" }
  */
 @Path("/client")
+@RolesAllowed({"ADMIN", "ARTIST", "CLIENT"})
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ClientRest {
@@ -31,6 +34,7 @@ public class ClientRest {
      * pagination: offset, limit
      */
     @GET
+    @PermitAll
     @Path("/designs")
     public Response listDesigns(@QueryParam("offset") @DefaultValue("0") int offset,
                                 @QueryParam("limit") @DefaultValue("50") int limit) {
@@ -49,6 +53,7 @@ public class ClientRest {
      * q (keyword), style, minPrice, maxPrice, offset, limit
      */
     @GET
+    @PermitAll
     @Path("/designs/search")
     public Response searchDesigns(@QueryParam("q") String q,
                                   @QueryParam("style") String style,
@@ -80,6 +85,7 @@ public class ClientRest {
      * so we fetch list and search — this keeps REST layer independent of EM.
      */
     @GET
+    @PermitAll
     @Path("/designs/{id}")
     public Response getDesignById(@PathParam("id") Long id) {
         try {

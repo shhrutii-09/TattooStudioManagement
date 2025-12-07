@@ -8,4 +8,18 @@
             30
         </session-timeout>
     </session-config>
-</web-app>
+
+    <security-role>
+        <role-name>ADMIN</role-name>
+    </security-role>
+    <security-role>
+        <role-name>ARTIST</role-name>
+    </security-role>
+    <security-role>
+        <role-name>CLIENT</role-name>
+    </security-role>
+    <context-param>
+  <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+  <param-value>.xhtml</param-value>
+</context-param>
+    </web-app>

@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Admin Dashboard — InkFlow</ui:define>
+    <ui:define name="pageTitle">Dashboard</ui:define>
+
+    <ui:define name="content">
+        <h:form>
+            <section class="dashboard-header">
+                <h2>Overview</h2>
+                <p class="muted">Quick stats for the studio</p>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">#{adminDashboardBean.dashboard.totalUsers}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">#{adminDashboardBean.dashboard.totalArtists}</div>
+                    <div class="stat-label">Total Artists</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">#{adminDashboardBean.dashboard.todaysAppointments}</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value">₹ #{adminDashboardBean.dashboard.totalEarnings}</div>
+                    <div class="stat-label">Total Earnings</div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <h3>Recent Appointments</h3>
+
+                <p:dataTable value="#{adminDashboardBean.dashboard.recentAppointments}"
+             var="a" rows="5" paginator="true">
+    <p:column headerText="ID">#{a.appointmentId}</p:column>
+    <p:column headerText="Client">#{a.client.fullName}</p:column>
+    <p:column headerText="Artist">#{a.artist.fullName}</p:column>
+    <p:column headerText="Date / Time">#{a.appointmentDateTime}</p:column>
+    <p:column headerText="Status">
+        <span class="status-text">#{a.status}</span>
+    </p:column>
+</p:dataTable>
+            </section>
+        </h:form>
+    </ui:define>
+</ui:composition>

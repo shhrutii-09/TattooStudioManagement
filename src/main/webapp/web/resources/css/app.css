@@ -1,0 +1,405 @@
+/* ----------------------------------------------------------
+   GLOBAL STYLE — Matches Login Page Aesthetic
+---------------------------------------------------------- */
+
+:root {
+    --bg-light: #faf7f2;
+    --card-bg: #ffffff;
+    --text-dark: #222222;
+    --text-muted: #7a7a7a;
+    --accent-gold: #c7a45b;
+    --accent-black: #111111;
+    --shadow-soft: rgba(0,0,0,0.08);
+    --radius: 10px;
+    --sidebar-width: 230px;
+    --topbar-height: 65px;
+}
+
+/* Page background — identical to login page */
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-light) url('../images/dots.png') repeat;
+    font-family: "Inter", sans-serif;
+    color: var(--text-dark);
+    display: flex;
+}
+
+/* Typography */
+h1, h2, h3 {
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+p, span, small {
+    color: var(--text-muted);
+}
+
+/* ----------------------------------------------
+   SIDEBAR
+---------------------------------------------- */
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: 2px 0 10px var(--shadow-soft);
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px;
+}
+
+.brand {
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.brand-title {
+    font-family: "Playfair Display", serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--text-dark);
+}
+
+.brand-sub {
+    font-size: 13px;
+    color: var(--accent-gold);
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: var(--text-dark);
+    background: transparent;
+    border-radius: var(--radius);
+    transition: 0.2s ease;
+}
+
+.nav-item:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.nav-item i {
+    font-size: 18px;
+}
+
+/* Bottom of sidebar */
+.sidebar-bottom {
+    margin-top: auto;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ----------------------------------------------
+   TOPBAR
+---------------------------------------------- */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--topbar-height);
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    box-shadow: 0 4px 10px var(--shadow-soft);
+    z-index: 10;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.menu-toggle {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.page-title {
+    font-size: 20px;
+    font-family: "Playfair Display", serif;
+}
+
+/* Admin info right section */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-name {
+    font-weight: 500;
+}
+
+/* Logout button */
+.btn-logout {
+    background: var(--accent-black) !important;
+    border: none !important;
+    color: white !important;
+    padding: 7px 14px !important;
+    border-radius: var(--radius) !important;
+    cursor: pointer;
+}
+
+/* ----------------------------------------------
+   MAIN CONTENT
+---------------------------------------------- */
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--topbar-height);
+    padding: 20px;
+    flex: 1;
+    overflow-x: auto;
+}
+
+
+/* ----------------------------------------------
+   DASHBOARD HEADER
+---------------------------------------------- */
+
+.dashboard-header h2 {
+    margin-bottom: 5px;
+    font-size: 28px;
+}
+
+.dashboard-header .muted {
+    margin-bottom: 20px;
+}
+
+/* ----------------------------------------------
+   STAT GRID
+---------------------------------------------- */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: 0 2px 8px var(--shadow-soft);
+    text-align: center;
+}
+
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--accent-black);
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.table-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px var(--shadow-soft);
+}
+
+
+.table-section h3 {
+    margin-bottom: 15px;
+    font-family: "Playfair Display", serif;
+}
+
+/* PrimeFaces adjustments */
+.ui-datatable {
+    background: var(--card-bg) !important;
+    border-radius: var(--radius);
+    padding: 10px;
+    box-shadow: 0 4px 10px var(--shadow-soft);
+}
+
+.status-text {
+    color: var(--accent-black);
+    font-weight: 600;
+}
+
+/* ----------------------------------------------
+   RESPONSIVE
+---------------------------------------------- */
+
+@media(max-width: 1000px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* Collapsed sidebar state */
+body.collapsed .sidebar {
+  width: 60px;
+  overflow: hidden;
+  padding: 20px 10px;
+}
+
+body.collapsed .nav-item span,
+body.collapsed .brand-sub,
+body.collapsed .brand-title {
+  display: none;
+}
+
+body.collapsed .nav-item {
+  justify-content: center;
+}
+
+body.collapsed .nav-item i {
+  font-size: 20px;
+}
+
+/* Adjust main content and topbar when collapsed */
+body.collapsed .main-content {
+  margin-left: 60px;
+}
+
+body.collapsed .topbar {
+  left: 60px;
+}
+
+.sidebar,
+.main-content,
+.topbar {
+  transition: all 0.3s ease;
+}
+
+.profile-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.card-section {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--shadow-soft);
+  padding: 20px;
+}
+
+.section-title {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  margin: 0 0 12px 0;
+  color: var(--text-dark);
+}
+
+.profile-grid h\:outputText,
+.profile-grid .ui-inputfield {
+  width: 100%;
+}
+
+.password-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.btn-primary {
+  background: var(--accent-black) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 8px 16px !important;
+  border-radius: var(--radius) !important;
+}
+
+@media(max-width: 700px) {
+  .password-grid { grid-template-columns: 1fr; }
+}
+
+.profile-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-section {
+  flex: 1;
+  min-width: 320px;
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.profile-section h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: var(--text-dark);
+}
+
+.profile-grid .label-col {
+  width: 130px;
+  text-align: right;
+  padding-right: 10px;
+  vertical-align: middle;
+}
+
+.profile-grid .value-col {
+  width: 100%;
+}
+
+.wide-input {
+  width: 200% !important;
+}
+
+.btn-primary {
+  margin-top: 10px;
+  background-color: var(--accent-black);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.profile-grid .label-col {
+  width: 140px;
+  text-align: right;
+  padding-right: 12px;
+  vertical-align: middle;
+}
+
+.profile-grid .value-col { width: 100%; }
+.wide-input { width: 100% !important; }

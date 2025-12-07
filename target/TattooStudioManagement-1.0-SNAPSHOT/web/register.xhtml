@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Join InkFlow | Studio Registration</title>
+        <!-- Google Fonts: Playfair Display for Headers, Lato for Body -->
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet" />
+        
+        <style>
+            :root {
+                --bg-cream: #fdfbf7;
+                --card-white: #ffffff;
+                --ink-black: #2d2d2d;
+                --ink-light: #4a4a4a;
+                --gold-accent: #c5a059;
+                --gold-light: #f3e9d2;
+                --error-red: #d32f2f;
+                --border-color: #e0e0e0;
+            }
+
+            body {
+                background-color: var(--bg-cream);
+                font-family: 'Lato', sans-serif;
+                margin: 0;
+                padding: 0;
+                color: var(--ink-light);
+                background-image: radial-gradient(#e6e6e6 1px, transparent 1px);
+                background-size: 20px 20px; /* Subtle texture */
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .register-container {
+                width: 100%;
+                max-width: 550px;
+                padding: 20px;
+            }
+
+            .register-card {
+                background: var(--card-white);
+                border: 1px solid rgba(0,0,0,0.05);
+                border-radius: 4px; /* Slight rounded corners, classic feel */
+                box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+                padding: 40px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Top accent bar representing "Ink" */
+            .register-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, var(--ink-black), var(--gold-accent));
+            }
+
+            .header-section {
+                text-align: center;
+                margin-bottom: 35px;
+            }
+
+            .app-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: var(--ink-black);
+                margin: 0;
+                letter-spacing: -0.5px;
+            }
+
+            .app-subtitle {
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                color: var(--gold-accent);
+                margin-top: 5px;
+                font-weight: 700;
+            }
+
+            /* Form Styles */
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-label {
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 700;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--ink-black);
+            }
+
+            /* Overriding PrimeFaces Input Styles for Aesthetic */
+            body .ui-inputfield {
+                width: 100%;
+                background: #fcfcfc;
+                border: 1px solid var(--border-color);
+                padding: 12px;
+                border-radius: 0; /* Sharp edges for artistic feel */
+                border-bottom: 2px solid var(--border-color);
+                box-shadow: none !important;
+                transition: all 0.3s ease;
+                font-family: 'Lato', sans-serif;
+            }
+
+            body .ui-inputfield:focus {
+                background: #fff;
+                border-bottom-color: var(--gold-accent) !important;
+                border-color: var(--border-color);
+            }
+            
+            body .ui-password {
+                width: 100%;
+            }
+
+            /* Custom Role Selection Cards */
+            .role-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .role-card {
+                border: 1px solid var(--border-color);
+                padding: 15px 5px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                border-radius: 4px;
+                background: #fff;
+            }
+
+            .role-card:hover {
+                border-color: var(--gold-accent);
+                transform: translateY(-2px);
+            }
+
+            .role-card.active {
+                background-color: var(--ink-black);
+                border-color: var(--ink-black);
+                color: #fff;
+            }
+
+            .role-card.active i, 
+            .role-card.active .role-name, 
+            .role-card.active .role-desc {
+                color: #fff;
+            }
+
+            .role-card i {
+                font-size: 1.5rem;
+                color: var(--gold-accent);
+                margin-bottom: 8px;
+                display: block;
+            }
+
+            .role-name {
+                font-weight: 700;
+                font-size: 0.9rem;
+                display: block;
+            }
+
+            .role-desc {
+                font-size: 0.7rem;
+                color: #888;
+                display: block;
+                margin-top: 4px;
+            }
+
+            /* Button Styling */
+            body .ui-button {
+                background: var(--ink-black) !important;
+                border: none !important;
+                color: #fff !important;
+                width: 100%;
+                padding: 12px;
+                height: 50px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+            }
+
+            body .ui-button:hover {
+                background: var(--gold-accent) !important;
+                color: var(--ink-black) !important;
+            }
+
+            /* Links */
+            .login-link {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 0.9rem;
+            }
+
+            .login-link a {
+                color: var(--gold-accent);
+                text-decoration: none;
+                font-weight: 700;
+                border-bottom: 1px dotted var(--gold-accent);
+                transition: all 0.2s;
+            }
+
+            .login-link a:hover {
+                color: var(--ink-black);
+                border-bottom-style: solid;
+            }
+            
+            /* Messages */
+            body .ui-messages .ui-messages-error {
+                background-color: #fce4e4;
+                color: var(--error-red);
+                border: none;
+                border-left: 4px solid var(--error-red);
+            }
+            
+            body .ui-messages .ui-messages-info {
+                background-color: var(--gold-light);
+                color: var(--ink-black);
+                border: none;
+                border-left: 4px solid var(--gold-accent);
+            }
+
+            /* Input Group Addon (Icon inside input) */
+            body .ui-inputgroup-addon {
+                background: transparent;
+                border: none;
+                border-bottom: 2px solid var(--border-color);
+                color: var(--gold-accent);
+                padding-top: 15px;
+            }
+            
+            /* Checkbox aesthetic */
+            body .ui-chkbox .ui-chkbox-box.ui-state-active {
+                border-color: var(--gold-accent);
+                background: var(--gold-accent);
+            }
+            
+
+.ui-button.ui-button-text-only:hover {
+    background: var(--gold-accent) !important;
+    color: var(--ink-black) !important;
+}
+
+        </style>
+
+        <script>
+            function selectRole(roleName, element) {
+                // Update hidden input
+                document.getElementById('registerForm:selectedRole').value = roleName;
+                
+                // Visual update
+                var cards = document.querySelectorAll('.role-card');
+                cards.forEach(c => c.classList.remove('active'));
+                element.classList.add('active');
+            }
+        </script>
+    </h:head>
+
+    <h:body>
+        <div class="register-container">
+            <div class="register-card">
+                
+                <div class="header-section">
+                    <h1 class="app-title">InkFlow</h1>
+                    <div class="app-subtitle">Studio Management</div>
+                </div>
+
+                <!-- Global Messages -->
+                <p:messages id="msgs" showDetail="true" closable="true">
+                    <p:autoUpdate />
+                </p:messages>
+
+                <h:form id="registerForm">
+                    
+                    <!-- 1. Full Name -->
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon"><i class="pi pi-user"></i></span>
+                            <p:inputText id="fullname" value="#{registrationBean.registerDTO.fullName}" 
+                                         required="true" requiredMessage="Full name is required"
+                                         placeholder="e.g. John Doe" />
+                        </div>
+                        <p:message for="fullname" display="text" />
+                    </div>
+
+                    <!-- 2. Email -->
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div class="ui-inputgroup">
+                            <span class="ui-inputgroup-addon"><i class="pi pi-envelope"></i></span>
+                            <p:inputText id="email" value="#{registrationBean.registerDTO.email}" 
+                                         required="true" requiredMessage="Email is required"
+                                         validator="#{registrationBean.validateEmail}"
+                                         placeholder="name@example.com" />
+                        </div>
+                        <p:message for="email" display="text" />
+                    </div>
+
+                    <!-- 3. Username & Phone (Grid) -->
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-g-12 ui-md-6" style="padding-right: 5px;">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <p:inputText id="username" value="#{registrationBean.registerDTO.username}" 
+                                             required="true" requiredMessage="Username is required"
+                                             placeholder="Unique ID" />
+                                <p:message for="username" display="text" />
+                            </div>
+                        </div>
+                        <div class="ui-g-12 ui-md-6" style="padding-left: 5px;">
+                            <div class="form-group">
+                                <label class="form-label">Phone</label>
+                                <p:inputText id="phone" value="#{registrationBean.registerDTO.phone}" 
+                                             required="true" requiredMessage="Phone is required"
+                                             validator="#{registrationBean.validatePhone}"
+                                             placeholder="10 digits" />
+                                <p:message for="phone" display="text" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Password -->
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <p:password id="pwd1" value="#{registrationBean.registerDTO.password}" 
+                                    required="true" requiredMessage="Password is required"
+                                    validator="#{registrationBean.validatePassword}"
+                                    match="pwd2" label="Password 1" feedback="true" inline="true"
+                                    placeholder="Min 6 chars, alphanumeric" />
+                        <p:message for="pwd1" display="text" />
+                    </div>
+
+                    <!-- 5. Confirm Password -->
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <p:password id="pwd2" value="#{registrationBean.confirmPassword}" 
+                                    required="true" requiredMessage="Confirm Password is required"
+                                    label="Password 2" placeholder="Re-enter password" />
+                        <p:message for="pwd2" display="text" />
+                    </div>
+
+                    <!-- 6. Role Selection (Aesthetic Cards) -->
+                    <div class="form-group">
+                        <label class="form-label">I am a...</label>
+                        
+                        <!-- Hidden input to store actual value -->
+                        <h:inputHidden id="selectedRole" value="#{registrationBean.registerDTO.role}" required="true" requiredMessage="Please select a role" />
+                        
+                        <div class="role-grid">
+                            <div class="role-card" onclick="selectRole('CLIENT', this)">
+                                <i class="pi pi-user"></i>
+                                <span class="role-name">Client</span>
+                                <span class="role-desc">Book Tattoos</span>
+                            </div>
+                            <div class="role-card" onclick="selectRole('ARTIST', this)">
+                                <i class="pi pi-palette"></i>
+                                <span class="role-name">Artist</span>
+                                <span class="role-desc">Manage Portfolio</span>
+                            </div>
+                            <div class="role-card" onclick="selectRole('ADMIN', this)">
+                                <i class="pi pi-cog"></i>
+                                <span class="role-name">Admin</span>
+                                <span class="role-desc">Studio Owner</span>
+                            </div>
+                        </div>
+                        <p:message for="selectedRole" display="text" />
+                    </div>
+
+                    <!-- 7. Terms Checkbox -->
+                    <div class="form-group" style="display: flex; align-items: center; margin-top: 15px;">
+                        <p:selectBooleanCheckbox id="terms" required="true" requiredMessage="You must accept the terms" />
+                        <h:outputLabel for="terms" value="I agree to the Terms of Service" style="margin-left: 10px; font-size: 0.9rem;" />
+                    </div>
+                    <p:message for="terms" display="text" />
+
+                    <!-- Submit Button -->
+                    <p:commandButton value="Create Account"
+    styleClass="myButton"
+    action="#{registrationBean.register}"
+    update="@form, msgs"
+    oncomplete="if(!args.validationFailed){ setTimeout(function(){ window.location='login.xhtml'; }, 2000); }" />
+
+                </h:form>
+
+                <div class="login-link">
+                    Already a member? <a href="login.xhtml">Sign In Here</a>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>

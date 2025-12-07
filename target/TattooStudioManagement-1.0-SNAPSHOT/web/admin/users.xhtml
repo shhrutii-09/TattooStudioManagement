@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Admin — Users | InkFlow</ui:define>
+    <ui:define name="pageTitle">Users</ui:define>
+
+    <ui:define name="content">
+        <h:form id="usersForm">
+
+            <!-- Growl -->
+            <p:growl id="msgs" showDetail="true" life="3000" />
+
+            <!-- HEADER -->
+            <section class="table-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <h3>Users</h3>
+                        <p class="muted">Manage all registered users.</p>
+                    </div>
+
+                    <p:commandButton icon="pi pi-refresh"
+                                     update=":usersForm:usersTable :usersForm:msgs"
+                                     process="@this"
+                                     actionListener="#{adminUsersBean.loadUsers}"/>
+                </div>
+
+                <!-- TABLE -->
+                <p:dataTable id="usersTable"
+                             value="#{adminUsersBean.users}"
+                             var="u"
+                             rows="10"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             styleClass="ui-datatable">
+
+                    <p:column headerText="ID" width="60">
+                        #{u.userId}
+                    </p:column>
+
+                    <p:column headerText="Name">
+                        #{u.fullName}<br/>
+                        <small class="muted">#{u.username}</small>
+                    </p:column>
+
+                    <p:column headerText="Email">
+                        #{u.email}
+                    </p:column>
+
+                    <p:column headerText="Role" width="120">
+                        #{u.role.roleName}
+                    </p:column>
+
+                    <p:column headerText="Status" width="150">
+                        <h:outputText value="#{u.isActive ? 'Active' : 'Deactivated'}"/><br/>
+
+                        <!-- Artist verification -->
+                        <h:outputText value="#{u.isIsVerified ? 'Verified artist' : 'Unverified artist'}"
+                                      rendered="#{u.role.roleName eq 'ARTIST'}"
+                                      styleClass="muted"/>
+                    </p:column>
+
+                    <!-- ACTIONS -->
+                    <p:column headerText="Actions" width="260">
+
+                        <!-- VIEW -->
+                        <p:commandButton value="" icon="pi pi-eye"
+                 styleClass="btn-primary icon-btn"
+                 update=":usersForm:userViewDialog :usersForm:msgs"
+                 process="@this"
+                 actionListener="#{adminUsersBean.viewUser(u.userId)}"
+                 oncomplete="PF('dlgView').show()"/>
+
+
+                        <!-- ACTIVATE / DEACTIVATE -->
+                        <p:commandButton icon="#{u.isActive ? 'pi pi-ban' : 'pi pi-check'}"
+                                         style="margin-left:6px"
+                                         update=":usersForm:usersTable :usersForm:msgs"
+                                         actionListener="#{adminUsersBean.toggleActive(u.userId, u.isActive)}"
+                                         process="@this"/>
+
+                        <!-- VERIFY ARTIST -->
+                        <p:commandButton icon="pi pi-shield"
+                                         style="margin-left:6px"
+                                         rendered="#{u.role.roleName eq 'ARTIST' and not u.isIsVerified}"
+                                         update=":usersForm:usersTable :usersForm:msgs"
+                                         actionListener="#{adminUsersBean.verifyArtist(u.userId, true)}"
+                                         process="@this"/>
+
+                        <!-- UNVERIFY ARTIST -->
+                        <p:commandButton icon="pi pi-times"
+                                         style="margin-left:6px"
+                                         rendered="#{u.role.roleName eq 'ARTIST' and u.isIsVerified}"
+                                         update=":usersForm:usersTable :usersForm:msgs"
+                                         actionListener="#{adminUsersBean.verifyArtist(u.userId, false)}"
+                                         process="@this"/>
+
+                        
+                    </p:column>
+                </p:dataTable>
+            </section>
+
+            <!-- VIEW USER DIALOG -->
+            <p:dialog id="userViewDialog"
+                      widgetVar="dlgView"
+                      header="User Details"
+                      modal="true"
+                      width="420"
+                      resizable="false"
+                      appendTo="@(body)">
+
+                <h:panelGrid columns="2" columnClasses="label-col,value-col" style="width:100%">
+                    <h:outputText value="ID:" /><h:outputText value="#{adminUsersBean.viewingUser.userId}" />
+                    <h:outputText value="Name:" /><h:outputText value="#{adminUsersBean.viewingUser.fullName}" />
+                    <h:outputText value="Username:" /><h:outputText value="#{adminUsersBean.viewingUser.username}" />
+                    <h:outputText value="Email:" /><h:outputText value="#{adminUsersBean.viewingUser.email}" />
+                    <h:outputText value="Phone:" /><h:outputText value="#{adminUsersBean.viewingUser.phone}" />
+                    <h:outputText value="Role:" /><h:outputText value="#{adminUsersBean.viewingUser.role.roleName}" />
+                    <h:outputText value="Active:" /><h:outputText value="#{adminUsersBean.viewingUser.isActive ? 'Yes' : 'No'}" />
+                    <h:outputText value="Verified:" rendered="#{adminUsersBean.viewingUser.role.roleName eq 'ARTIST'}"/>
+                    <h:outputText value="#{adminUsersBean.viewingUser.isIsVerified ? 'Yes' : 'No'}"
+                                  rendered="#{adminUsersBean.viewingUser.role.roleName eq 'ARTIST'}"/>
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Close" onclick="PF('dlgView').hide();" type="button"/>
+                </f:facet>
+            </p:dialog>
+
+            <!-- DELETE CONFIRM -->
+
+
+        </h:form>
+    </ui:define>
+</ui:composition>

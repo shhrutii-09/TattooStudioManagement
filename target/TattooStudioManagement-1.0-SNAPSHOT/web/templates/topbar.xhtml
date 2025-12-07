@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="menu-toggle" type="button"
+        onclick="document.body.classList.toggle('collapsed')">
+    <i class="pi pi-bars"></i>
+</button>
+            <div class="page-title"><ui:insert name="pageTitle">Admin</ui:insert></div>
+        </div>
+
+        <div class="topbar-right">
+            <div class="admin-info">
+                <span class="admin-name">#{userSessionBean.loggedIn ? userSessionBean.username : 'Admin'}</span>
+                <!--<i class="pi pi-user"></i>-->
+               <h:link outcome="/web/admin/profile.xhtml" styleClass="nav-icon" title="Manage Profile">
+    <i class="pi pi-user" style="color: #c7a45b;"></i> <!-- gold shade -->
+</h:link>
+            </div>
+
+            <h:form id="logoutForm" prependId="false">
+                <p:commandButton value="Logout" action="#{loginBean.logout}" styleClass="btn-logout" icon="pi pi-sign-out" />
+            </h:form>
+        </div>
+    </header>
+</ui:composition>

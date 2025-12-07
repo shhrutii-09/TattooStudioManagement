@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-title">InkFlow</div>
+            <div class="brand-sub">Admin</div>
+        </div>
+
+        <nav class="nav-list">
+            <h:link outcome="dashboard.xhtml" styleClass="nav-item">
+                <i class="pi pi-home"></i><span>Dashboard</span>
+            </h:link>
+            <h:link outcome="users.xhtml" styleClass="nav-item">
+                <i class="pi pi-users"></i><span>Users</span>
+            </h:link>
+            <h:link outcome="artists.xhtml" styleClass="nav-item">
+                <i class="pi pi-id-card"></i><span>Artists</span>
+            </h:link>
+            <h:link outcome="designs.xhtml" styleClass="nav-item">
+                <i class="pi pi-image"></i><span>Designs</span>
+            </h:link>
+            <h:link outcome="appointments.xhtml" styleClass="nav-item">
+                <i class="pi pi-calendar"></i><span>Appointments</span>
+            </h:link>
+            <h:link outcome="payments.xhtml" styleClass="nav-item">
+                <i class="pi pi-wallet"></i><span>Payments</span>
+            </h:link>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <small class="muted">© InkFlow</small>
+        </div>
+    </aside>
+</ui:composition>
