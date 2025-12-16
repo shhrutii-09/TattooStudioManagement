@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Admin — Medical Forms | InkFlow</ui:define>
+    <ui:define name="pageTitle">Medical Forms</ui:define>
+
+    <ui:define name="content">
+        <h:form id="medicalFormsForm">
+
+            <!-- Growl for messages -->
+            <p:growl id="msgs" showDetail="true" life="3000" />
+
+            <!-- STATISTICS CARDS -->
+            <div class="stats-cards" style="margin-bottom: 20px;">
+                <div class="stat-card">
+                    <div class="stat-number">#{medicalFormManagementBean.totalForms}</div>
+                    <div class="stat-label">Total Forms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">#{medicalFormManagementBean.statistics['approvedForms']}</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">#{medicalFormManagementBean.statistics['pendingForms']}</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        <h:outputText value="#{medicalFormManagementBean.statistics['approvalRate']}">
+                            <f:convertNumber maxFractionDigits="1" />
+                        </h:outputText>%
+                    </div>
+                    <div class="stat-label">Approval Rate</div>
+                </div>
+            </div>
+
+            <!-- FILTER SECTION -->
+            <section class="filter-section" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                <h4 style="margin-top: 0;">Filter Forms</h4>
+                <div class="filter-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <p:outputLabel value="Client Name" />
+                        <p:inputText value="#{medicalFormManagementBean.filter.clientName}" 
+                                   placeholder="Search by client name..."
+                                   style="width: 100%;" />
+                    </div>
+                    
+                    <div>
+                        <p:outputLabel value="Status" />
+                        <p:selectOneMenu value="#{medicalFormManagementBean.filter.isApproved}" 
+                                       style="width: 100%;">
+                            <f:selectItem itemLabel="All" itemValue="#{null}" />
+                            <f:selectItem itemLabel="Pending" itemValue="false" />
+                            <f:selectItem itemLabel="Approved" itemValue="true" />
+                        </p:selectOneMenu>
+                    </div>
+                    
+                    <div>
+                        <p:outputLabel value="Appointment Status" />
+                        <p:selectOneMenu value="#{medicalFormManagementBean.filter.appointmentStatus}" 
+                                       style="width: 100%;">
+                            <f:selectItem itemLabel="All" itemValue="ALL" />
+                            <f:selectItem itemLabel="Pending" itemValue="PENDING" />
+                            <f:selectItem itemLabel="Confirmed" itemValue="CONFIRMED" />
+                            <f:selectItem itemLabel="Completed" itemValue="COMPLETED" />
+                            <f:selectItem itemLabel="Cancelled" itemValue="CANCELLED" />
+                        </p:selectOneMenu>
+                    </div>
+                    
+                    <div>
+                        <p:outputLabel value="Start Date" />
+                        <p:calendar value="#{medicalFormManagementBean.filter.startDate}" 
+                                  pattern="yyyy-MM-dd"
+                                  style="width: 100%;" />
+                    </div>
+                    
+                    <div>
+                        <p:outputLabel value="End Date" />
+                        <p:calendar value="#{medicalFormManagementBean.filter.endDate}" 
+                                  pattern="yyyy-MM-dd"
+                                  style="width: 100%;" />
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <p:commandButton value="Search" 
+                                   icon="pi pi-search"
+                                   update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs"
+                                   action="#{medicalFormManagementBean.search}"
+                                   styleClass="btn-primary" />
+                    
+                    <p:commandButton value="Clear Filters" 
+               icon="pi pi-times"
+               update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs @form"
+               action="#{medicalFormManagementBean.clearFilters}"
+               styleClass="btn-secondary" />
+                    <p:commandButton value="Refresh" 
+                                   icon="pi pi-refresh"
+                                   update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs"
+                                   action="#{medicalFormManagementBean.loadMedicalForms}"
+                                   styleClass="btn-secondary" />
+                </div>
+            </section>
+
+            <!-- MEDICAL FORMS TABLE -->
+            <section class="table-section">
+                <h:panelGroup layout="block" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <h3>Medical Forms</h3>
+                        <p class="muted">Review and manage client medical forms.</p>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:outputLabel value="Show: " style="margin-right: 5px;" />
+                        <p:selectOneMenu value="#{medicalFormManagementBean.pageSize}" 
+                                       style="width: 80px;"
+                                       onchange="PF('medicalFormsTable').filter();">
+                            <f:selectItem itemLabel="10" itemValue="10" />
+                            <f:selectItem itemLabel="25" itemValue="25" />
+                            <f:selectItem itemLabel="50" itemValue="50" />
+                            <f:selectItem itemLabel="100" itemValue="100" />
+                        </p:selectOneMenu>
+                    </div>
+                </h:panelGroup>
+
+                <p:dataTable id="medicalFormsTable"
+                           value="#{medicalFormManagementBean.medicalForms}"
+                           var="form"
+                           rows="#{medicalFormManagementBean.pageSize}"
+                           paginator="true"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="10,25,50,100"
+                           paginatorPosition="bottom"
+                           styleClass="ui-datatable"
+                           emptyMessage="No medical forms found.">
+
+                    <p:column headerText="Form ID" width="80" sortBy="#{form.formId}">
+                        <h:outputText value="#{form.formId}" />
+                    </p:column>
+
+                    <p:column headerText="Client" sortBy="#{form.clientName}">
+                        <h:panelGroup rendered="#{form != null}">
+                            <strong>#{form.clientName}</strong><br/>
+                            <small class="muted">#{form.clientEmail}</small>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column headerText="Appointment" width="180">
+                        <h:panelGroup rendered="#{form != null and form.appointmentId != null}">
+                            <h:outputText value="Appt ##{form.appointmentId}" /><br/>
+                            <small class="muted">
+                                #{form.appointmentDateTime}
+                            </small>
+                        </h:panelGroup>
+                        <h:outputText value="-" rendered="#{form == null or form.appointmentId == null}" />
+                    </p:column>
+
+                    <p:column headerText="Medical Details" width="200">
+                        <h:panelGroup layout="block" style="font-size: 12px;" rendered="#{form != null}">
+                            <h:outputText value="Minor: #{form.isMinor ? 'Yes' : 'No'}" rendered="#{form.isMinor != null}" /><br/>
+                            <h:outputText value="Pregnant: #{form.isPregnant ? 'Yes' : 'No'}" rendered="#{form.isPregnant != null}" /><br/>
+                            <h:outputText value="Allergies: #{form.hasAllergies ? 'Yes' : 'No'}" rendered="#{form.hasAllergies != null}" />
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column headerText="Status" width="120">
+                        <h:panelGroup rendered="#{form != null}">
+                            <span class="status-badge #{medicalFormManagementBean.getStatusBadge(form.isApproved ? 'APPROVED' : (form.approvedAt != null ? 'REJECTED' : 'PENDING'))}">
+                                #{medicalFormManagementBean.getStatusText(form)}
+                            </span>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column headerText="Submitted" width="150">
+                        <h:panelGroup rendered="#{form != null and form.submittedAt != null}">
+                            #{form.submittedAt}
+                        </h:panelGroup>
+                    </p:column>
+
+                    <p:column headerText="Actions" width="200" style="text-align: center;">
+                        <!-- VIEW DETAILS -->
+                        <p:commandButton icon="pi pi-eye"
+                                       styleClass="btn-primary icon-btn"
+                                       update=":medicalFormsForm:formDetailsDialog :medicalFormsForm:msgs"
+                                       action="#{medicalFormManagementBean.viewFormDetails(form.formId)}"
+                                       oncomplete="PF('dlgFormDetails').show()"
+                                       title="View Details"
+                                       rendered="#{form != null and form.formId != null}" />
+                        
+                        <!-- APPROVE (only show if not approved) -->
+                        <p:commandButton icon="pi pi-check"
+                                       style="margin-left: 6px;"
+                                       styleClass="btn-success icon-btn"
+                                       rendered="#{form != null and form.isApproved != null and !form.isApproved}"
+                                       update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs"
+                                       action="#{medicalFormManagementBean.approveForm(form.formId)}"
+                                       title="Approve Form" />
+                        
+                        <!-- REJECT (only show if not approved) -->
+                        <p:commandButton icon="pi pi-times"
+                                       style="margin-left: 6px;"
+                                       styleClass="btn-danger icon-btn"
+                                       rendered="#{form != null and form.isApproved != null and !form.isApproved}"
+                                       update=":medicalFormsForm:rejectDialog :medicalFormsForm:msgs"
+                                       action="#{medicalFormManagementBean.setSelectedFormForRejection(form)}"
+                                       oncomplete="PF('dlgReject').show()"
+                                       title="Reject Form" />
+                    </p:column>
+                </p:dataTable>
+            </section>
+
+            <!-- FORM DETAILS DIALOG -->
+            <p:dialog id="formDetailsDialog"
+                    widgetVar="dlgFormDetails"
+                    header="Medical Form Details #{medicalFormManagementBean.selectedForm != null ? '- Form #'.concat(medicalFormManagementBean.selectedForm.formId) : ''}"
+                    modal="true"
+                    width="600"
+                    height="500"
+                    resizable="false"
+                    appendTo="@(body)">
+
+                <h:panelGroup rendered="#{medicalFormManagementBean.selectedForm != null}">
+                    <h:panelGrid columns="2" columnClasses="label-col,value-col" style="width:100%; margin-bottom: 20px;">
+                        <h:outputText value="Form ID:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.formId}" />
+                        
+                        <h:outputText value="Client:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.clientName} (#{medicalFormManagementBean.selectedForm.clientEmail})" />
+                        
+                        <h:outputText value="Appointment:" style="font-weight: bold;" />
+                        <h:panelGroup>
+                            <h:outputText value="Appt ##{medicalFormManagementBean.selectedForm.appointmentId}" /><br/>
+                            <small class="muted">
+                                #{medicalFormManagementBean.selectedForm.appointmentDateTime}
+                            </small>
+                        </h:panelGroup>
+                        
+                        <h:outputText value="Status:" style="font-weight: bold;" />
+                        <span class="status-badge #{medicalFormManagementBean.getStatusBadge(medicalFormManagementBean.selectedForm.isApproved ? 'APPROVED' : (medicalFormManagementBean.selectedForm.approvedAt != null ? 'REJECTED' : 'PENDING'))}">
+                            #{medicalFormManagementBean.getStatusText(medicalFormManagementBean.selectedForm)}
+                        </span>
+                        
+                        <h:outputText value="Submitted:" style="font-weight: bold;" />
+                        #{medicalFormManagementBean.selectedForm.submittedAt}
+                        
+                        <h:outputText value="Approved By:" style="font-weight: bold;" 
+                                   rendered="#{medicalFormManagementBean.selectedForm.approvedByAdminName != null}" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.approvedByAdminName}"
+                                   rendered="#{medicalFormManagementBean.selectedForm.approvedByAdminName != null}" />
+                    </h:panelGrid>
+
+                    <hr style="margin: 20px 0;" />
+
+                    <h4>Medical Information</h4>
+                    <h:panelGrid columns="2" columnClasses="label-col,value-col" style="width:100%;">
+                        <h:outputText value="Minor:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.isMinor ? 'Yes' : 'No'}" />
+                        
+                        <h:outputText value="Pregnant:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.isPregnant ? 'Yes' : 'No'}" />
+                        
+                        <h:outputText value="Diabetes:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.diabetes ? 'Yes' : 'No'}" />
+                        
+                        <h:outputText value="Heart Condition:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.heartCondition ? 'Yes' : 'No'}" />
+                        
+                        <h:outputText value="Allergies:" style="font-weight: bold;" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.hasAllergies ? 'Yes' : 'No'}" />
+                        
+                        <h:outputText value="Allergy Details:" style="font-weight: bold;" 
+                                   rendered="#{medicalFormManagementBean.selectedForm.hasAllergies and medicalFormManagementBean.selectedForm.allergyDetails != null and not empty medicalFormManagementBean.selectedForm.allergyDetails}" />
+                        <h:outputText value="#{medicalFormManagementBean.selectedForm.allergyDetails}"
+                                   rendered="#{medicalFormManagementBean.selectedForm.hasAllergies and medicalFormManagementBean.selectedForm.allergyDetails != null and not empty medicalFormManagementBean.selectedForm.allergyDetails}" 
+                                   style="max-width: 250px; word-wrap: break-word;" />
+                    </h:panelGrid>
+                </h:panelGroup>
+                
+                <h:panelGroup rendered="#{medicalFormManagementBean.selectedForm == null}">
+                    <p>Loading form details...</p>
+                </h:panelGroup>
+
+                <f:facet name="footer">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <p:commandButton value="Close" 
+                                       onclick="PF('dlgFormDetails').hide();" 
+                                       styleClass="btn-secondary" />
+                        
+                        <p:commandButton value="Approve" 
+                                       icon="pi pi-check"
+                                       styleClass="btn-success"
+                                       rendered="#{medicalFormManagementBean.selectedForm != null and medicalFormManagementBean.selectedForm.isApproved != null and !medicalFormManagementBean.selectedForm.isApproved}"
+                                       update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs :medicalFormsForm:formDetailsDialog"
+                                       action="#{medicalFormManagementBean.approveForm(medicalFormManagementBean.selectedForm.formId)}"
+                                       oncomplete="PF('dlgFormDetails').hide()" />
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <!-- REJECT FORM DIALOG -->
+            <p:dialog id="rejectDialog"
+                    widgetVar="dlgReject"
+                    header="Reject Medical Form #{medicalFormManagementBean.selectedForm != null ? '- Form #'.concat(medicalFormManagementBean.selectedForm.formId) : ''}"
+                    modal="true"
+                    width="500"
+                    resizable="false"
+                    appendTo="@(body)">
+
+                <h:panelGroup rendered="#{medicalFormManagementBean.selectedForm != null}">
+                    <h:panelGrid columns="1" style="width:100%; margin-bottom: 20px;">
+                        <p>Client: <strong>#{medicalFormManagementBean.selectedForm.clientName}</strong></p>
+                        <p>Appointment: <strong>##{medicalFormManagementBean.selectedForm.appointmentId}</strong></p>
+                        
+                        <p:outputLabel value="Rejection Reason (required)" for="rejectionReason" style="display: block; margin-top: 15px;" />
+                        <p:inputTextarea id="rejectionReason" 
+                                       value="#{medicalFormManagementBean.rejectionReason}"
+                                       rows="4"
+                                       style="width: 100%;"
+                                       required="true"
+                                       requiredMessage="Please provide a reason for rejection" />
+                    </h:panelGrid>
+                </h:panelGroup>
+                
+                <h:panelGroup rendered="#{medicalFormManagementBean.selectedForm == null}">
+                    <p>Loading form details...</p>
+                </h:panelGroup>
+
+                <f:facet name="footer">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <p:commandButton value="Cancel" 
+                                       onclick="PF('dlgReject').hide();" 
+                                       styleClass="btn-secondary" />
+                        
+                        <p:commandButton value="Reject Form" 
+                                       icon="pi pi-times"
+                                       styleClass="btn-danger"
+                                       rendered="#{medicalFormManagementBean.selectedForm != null}"
+                                       update=":medicalFormsForm:medicalFormsTable :medicalFormsForm:msgs"
+                                       action="#{medicalFormManagementBean.rejectForm(medicalFormManagementBean.selectedForm.formId)}"
+                                       oncomplete="PF('dlgReject').hide()"
+                                       process="@this rejectionReason" />
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+        </h:form>
+
+        <!-- CSS STYLES -->
+        <style>
+            .stats-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            
+            .stat-card {
+                background: white;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .stat-number {
+                font-size: 28px;
+                font-weight: bold;
+                color: #007bff;
+                margin-bottom: 5px;
+            }
+            
+            .stat-label {
+                font-size: 14px;
+                color: #6c757d;
+            }
+            
+            .table-section {
+                background: white;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .filter-section {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .muted {
+                color: #6c757d;
+                font-size: 0.9em;
+            }
+            
+            .btn-primary {
+                background: #007bff;
+                border-color: #007bff;
+                color: white;
+            }
+            
+            .btn-secondary {
+                background: #6c757d;
+                border-color: #6c757d;
+                color: white;
+            }
+            
+            .btn-success {
+                background: #28a745;
+                border-color: #28a745;
+                color: white;
+            }
+            
+            .btn-danger {
+                background: #dc3545;
+                border-color: #dc3545;
+                color: white;
+            }
+            
+            .icon-btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+                border-radius: 0.2rem;
+            }
+            
+            .status-badge {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 0.25rem;
+            }
+            
+            .badge-success {
+                background-color: #d4edda;
+                color: #155724;
+            }
+            
+            .badge-warning {
+                background-color: #fff3cd;
+                color: #856404;
+            }
+            
+            .badge-danger {
+                background-color: #f8d7da;
+                color: #721c24;
+            }
+            
+            .label-col {
+                text-align: right;
+                padding-right: 15px;
+                font-weight: bold;
+                color: #495057;
+            }
+            
+            .value-col {
+                padding-left: 15px;
+                color: #212529;
+            }
+            
+            .ui-datatable {
+                font-size: 14px;
+            }
+            
+            .ui-datatable th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                color: #495057;
+            }
+            
+            .ui-datatable tr:hover {
+                background-color: #f8f9fa;
+            }
+        </style>
+    </ui:define>
+</ui:composition>

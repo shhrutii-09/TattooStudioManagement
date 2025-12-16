@@ -159,9 +159,9 @@ p, span, small {
 
 /* Logout button */
 .btn-logout {
-    background: var(--accent-black) !important;
+    background: buttonface !important;
     border: none !important;
-    color: white !important;
+    color: black !important;
     padding: 7px 14px !important;
     border-radius: var(--radius) !important;
     cursor: pointer;
@@ -403,3 +403,51 @@ body.collapsed .topbar {
 
 .profile-grid .value-col { width: 100%; }
 .wide-input { width: 100% !important; }
+
+/* Add to your main CSS file */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.85em;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10rem;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.datatable-sm th,
+.datatable-sm td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }

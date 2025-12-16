@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/web/artist/templates/layout.xhtml">
+
+    <ui:define name="title">My Schedule — InkFlow</ui:define>
+    <ui:define name="pageTitle">Weekly Working Schedule</ui:define>
+
+    <ui:define name="content">
+
+        <!-- MAIN FORM -->
+        <h:form id="scheduleForm">
+
+            <p:growl id="msg" showDetail="true" />
+
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <h2>My Weekly Schedule</h2>
+                <p class="muted">
+                    Define when you usually work.  
+                    This does <strong>not</strong> create appointments.
+                </p>
+            </section>
+
+            <!-- Table Section -->
+            <section class="table-section">
+
+                <p:dataTable value="#{artistScheduleBean.schedules}"
+                             var="s"
+                             styleClass="design-table"
+                             emptyMessage="No schedule defined yet.">
+
+                    <!-- Day -->
+                    <p:column headerText="Day" style="width:150px;">
+                        <strong>#{s.dayOfWeek}</strong>
+                    </p:column>
+
+                    <!-- Working -->
+                    <p:column headerText="Working?"
+                              style="width:120px; text-align:center;">
+                        <p:selectBooleanCheckbox value="#{s.working}" />
+                    </p:column>
+
+                    <!-- Start Time -->
+                    <p:column headerText="Start Time" style="width:160px;">
+                        <p:datePicker value="#{s.startTime}"
+                                      timeOnly="true"
+                                      pattern="HH:mm"
+                                      disabled="#{!s.working}" />
+                    </p:column>
+
+                    <!-- End Time -->
+                    <p:column headerText="End Time" style="width:160px;">
+                        <p:datePicker value="#{s.endTime}"
+                                      timeOnly="true"
+                                      pattern="HH:mm"
+                                      disabled="#{!s.working}" />
+                    </p:column>
+
+                    <!-- Action -->
+                    <p:column headerText="Action"
+                              style="width:120px; text-align:center;">
+                        <p:commandButton value="Save"
+                                         icon="pi pi-check"
+                                         styleClass="ui-button-success ui-button-sm"
+                                         actionListener="#{artistScheduleBean.saveSchedule(s)}"
+                                         update=":scheduleForm:msg" />
+                    </p:column>
+
+                </p:dataTable>
+
+            </section>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

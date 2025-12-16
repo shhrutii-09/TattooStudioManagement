@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "payment")
@@ -34,8 +35,9 @@ public class Payment implements Serializable {
     @Column(name = "STATUS", nullable = false, length = 50)
     private String status; // e.g., COMPLETED, FAILED, PENDING
 
-    @Column(name = "PAYMENT_DATE", nullable = false)
-    private LocalDateTime paymentDate = LocalDateTime.now();
+    @Column(name = "PAYMENT_DATE", nullable = true)
+    // REMOVE @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime paymentDate;
 
     public Payment() {}
 

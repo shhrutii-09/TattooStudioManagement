@@ -4,6 +4,7 @@ import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "time_slot")
@@ -67,5 +68,20 @@ public class TimeSlot implements Serializable {
     BOOKED,
     BLOCKED,
     PENDING_APPOINTMENT // Useful if an appointment requires artist confirmation
+}
+    
+    public String getStartTimeFormatted() {
+    // Returns only the time part, e.g., 09:00
+    return startTime != null ? startTime.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
+}
+
+public String getEndTimeFormatted() {
+    // Returns only the time part, e.g., 12:30
+    return endTime != null ? endTime.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
+}
+
+public String getDateFormatted() {
+    // Returns only the date part, e.g., 14 Dec 2025
+    return startTime != null ? startTime.format(DateTimeFormatter.ofPattern("dd MMM yyyy")) : "";
 }
 }

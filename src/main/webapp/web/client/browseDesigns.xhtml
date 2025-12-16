@@ -1,0 +1,1188 @@
+<ui:composition template="/web/client/clientTemplate.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="title">Browse Tattoo Designs - InkFlow Studio</ui:define>
+
+    <ui:define name="styles">
+        <style>
+            /* Main Container */
+            .browse-container {
+                max-width: 1600px;
+                margin: 0 auto;
+                padding: 0 1.5rem;
+                min-height: 80vh;
+            }
+            
+            /* Compact Hero Header */
+            .browse-hero {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                color: white;
+                padding: 2.5rem 1rem;
+                border-radius: 0 0 1.5rem 1.5rem;
+                text-align: center;
+                margin-bottom: 2rem;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .browse-hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('https://images.unsplash.com/photo-1605649487212-2bd9a18c1bab?auto=format&amp;fit=crop&amp;w=1600&amp;q=80') center/cover;
+                opacity: 0.08;
+            }
+            
+            .browse-hero h1 {
+                font-size: 2.2rem;
+                margin-bottom: 0.75rem;
+                position: relative;
+                font-weight: 700;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                opacity: 0.85;
+                max-width: 500px;
+                margin: 0 auto;
+                position: relative;
+                line-height: 1.4;
+            }
+            
+            .stats-badge {
+                background: #daa520;
+                color: #1a1a2e;
+                padding: 0.5rem 1.25rem;
+                border-radius: 2rem;
+                font-weight: 700;
+                display: inline-block;
+                margin-top: 1rem;
+                position: relative;
+                font-size: 0.9rem;
+            }
+            
+            /* Compact Search Bar */
+            .search-bar-container {
+                max-width: 700px;
+                margin: 0 auto 2rem auto;
+                position: relative;
+                z-index: 100;
+            }
+            
+            .search-bar {
+                display: flex;
+                gap: 1rem;
+                background: white;
+                padding: 1.25rem;
+                border-radius: 1rem;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                align-items: center;
+                border: 1px solid #e9ecef;
+            }
+            
+            .search-input {
+                flex: 1;
+                padding: 0.9rem 1.25rem;
+                border: 2px solid #e9ecef;
+                border-radius: 0.75rem;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                font-family: inherit;
+            }
+            
+            .search-input:focus {
+                border-color: #daa520;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.1);
+            }
+            
+            .btn-search {
+                background: linear-gradient(135deg, #daa520, #b8860b);
+                color: white;
+                border: none;
+                padding: 0.9rem 1.75rem;
+                border-radius: 0.75rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+                font-size: 1rem;
+                font-family: inherit;
+            }
+            
+            .btn-search:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+            }
+            
+            /* Main Layout */
+            .main-layout {
+                display: grid;
+                grid-template-columns: 280px 1fr;
+                gap: 2.5rem;
+                margin-top: 1rem;
+            }
+            
+            @media (max-width: 1200px) {
+                .main-layout {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+                .filters-sidebar {
+                    display: none;
+                }
+                .filters-sidebar.show {
+                    display: block;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 1000;
+                    background: white;
+                    padding: 2rem;
+                    overflow-y: auto;
+                }
+            }
+            
+            /* Filters Sidebar */
+            .filters-sidebar {
+                background: white;
+                padding: 1.75rem;
+                border-radius: 1rem;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+                height: fit-content;
+                position: sticky;
+                top: 1.5rem;
+                border: 1px solid #f0f0f0;
+            }
+            
+            .filter-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #f0f0f0;
+            }
+            
+            .btn-clear {
+                background: transparent;
+                color: #6c757d;
+                border: 1px solid #e9ecef;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                font-size: 0.85rem;
+                transition: all 0.3s ease;
+                font-family: inherit;
+            }
+            
+            .btn-clear:hover {
+                background: #f8f9fa;
+                color: #495057;
+            }
+            
+            .filter-section {
+                margin-bottom: 1.75rem;
+            }
+            
+            .filter-title {
+                font-size: 0.95rem;
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+                color: #1a1a2e;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .filter-title i {
+                color: #daa520;
+                font-size: 0.9rem;
+            }
+            
+            .style-select {
+                width: 100%;
+                padding: 0.7rem 0.75rem;
+                border: 2px solid #e9ecef;
+                border-radius: 0.5rem;
+                background: white;
+                font-size: 0.95rem;
+                font-family: inherit;
+                cursor: pointer;
+            }
+            
+            .price-inputs {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+            
+            .price-input {
+                padding: 0.7rem 0.75rem;
+                border: 2px solid #e9ecef;
+                border-radius: 0.5rem;
+                font-size: 0.95rem;
+                font-family: inherit;
+            }
+            
+            .sort-options {
+                display: flex;
+                flex-direction: column;
+                gap: 0.65rem;
+            }
+            
+            .sort-option {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.7rem 0.9rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+                background: #f8f9fa;
+                text-decoration: none;
+                color: #495057;
+            }
+            
+            .sort-option:hover {
+                background: #e9ecef;
+                text-decoration: none;
+            }
+            
+            .sort-option.active {
+                background: #daa520;
+                color: #1a1a2e;
+                font-weight: 600;
+                border-color: #daa520;
+            }
+            
+            /* Designs Section */
+            .designs-section {
+                width: 100%;
+            }
+            
+            .results-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #f0f0f0;
+            }
+            
+            .results-count {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #1a1a2e;
+            }
+            
+            .results-count span {
+                color: #daa520;
+                font-weight: 700;
+            }
+            
+            .grid-toggle {
+                display: flex;
+                gap: 0.5rem;
+                background: white;
+                padding: 0.4rem;
+                border-radius: 0.5rem;
+                border: 2px solid #e9ecef;
+            }
+            
+            .grid-btn {
+                padding: 0.5rem 0.9rem;
+                border: none;
+                background: transparent;
+                border-radius: 0.375rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 0.9rem;
+                color: #6c757d;
+            }
+            
+            .grid-btn:hover {
+                background: #f8f9fa;
+            }
+            
+            .grid-btn.active {
+                background: #daa520;
+                color: white;
+            }
+            
+            /* Pinterest Style Grid */
+            .designs-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 1.75rem;
+                margin-bottom: 2.5rem;
+            }
+            
+            .design-card {
+                background: white;
+                border-radius: 1rem;
+                overflow: hidden;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                transition: all 0.3s ease;
+                border: 1px solid #f0f0f0;
+                position: relative;
+                height: fit-content;
+            }
+            
+            .design-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+                border-color: #daa520;
+            }
+            
+            .card-image-wrapper {
+                height: 240px;
+                overflow: hidden;
+                position: relative;
+                background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+            }
+            
+            .card-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.6s ease;
+                background-color: #f8f9fa;
+            }
+            
+            .design-card:hover .card-image {
+                transform: scale(1.05);
+            }
+            
+            .card-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(to top, rgba(26, 26, 46, 0.9) 0%, transparent 50%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                display: flex;
+                align-items: flex-end;
+                padding: 1.5rem;
+            }
+            
+            .design-card:hover .card-overlay {
+                opacity: 1;
+            }
+            
+            .card-actions {
+                display: flex;
+                gap: 0.75rem;
+                width: 100%;
+            }
+            
+            .action-btn {
+                flex: 1;
+                background: white;
+                border: none;
+                padding: 0.65rem;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                text-decoration: none;
+            }
+            
+            .action-btn.like-btn {
+                background: #daa520;
+                color: white;
+            }
+            
+            .action-btn.view-btn {
+                background: #1a1a2e;
+                color: white;
+            }
+            
+            .action-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+                text-decoration: none;
+            }
+            
+            .card-content {
+                padding: 1.25rem;
+            }
+            
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #1a1a2e;
+                margin: 0;
+                line-height: 1.3;
+                flex: 1;
+            }
+            
+            .card-price {
+                background: #daa520;
+                color: #1a1a2e;
+                padding: 0.25rem 0.65rem;
+                border-radius: 1rem;
+                font-weight: 700;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                margin-left: 0.5rem;
+            }
+            
+            .card-description {
+                color: #6c757d;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                margin-bottom: 1rem;
+                height: 3.8em;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
+            
+            .style-badge {
+                background: linear-gradient(135deg, #6c63ff, #4a44d0);
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 1rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                display: inline-block;
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid #f0f0f0;
+            }
+            
+            .artist-info {
+                display: flex;
+                align-items: center;
+                gap: 0.65rem;
+            }
+            
+            .artist-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #6c63ff, #4a44d0);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 600;
+                font-size: 0.8rem;
+            }
+            
+            .artist-name {
+                font-weight: 600;
+                font-size: 0.85rem;
+                color: #1a1a2e;
+            }
+            
+            .card-stats {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.8rem;
+                color: #6c757d;
+                margin-bottom: 0.5rem;
+            }
+            
+            .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+            
+            .stat-item.liked {
+                color: #ff416c;
+            }
+            
+            .stat-item.favourited {
+                color: #ffc107;
+            }
+            
+            /* Favourite Button */
+            .favourite-btn {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 1.1rem;
+                color: #6c757d;
+                transition: all 0.3s ease;
+                padding: 0.25rem;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .favourite-btn:hover {
+                color: #ffc107;
+                background: rgba(255, 193, 7, 0.1);
+            }
+            
+            .favourite-btn .fas.fa-star {
+                color: #ffc107;
+            }
+            
+            .favourite-btn .far.fa-star {
+                color: #6c757d;
+            }
+            
+            /* Like Button */
+            .like-btn-single {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 1.2rem;
+                color: #6c757d;
+                transition: all 0.3s ease;
+                padding: 0.25rem;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 0.5rem;
+            }
+            
+            .like-btn-single:hover {
+                color: #ff416c;
+                background: rgba(255, 65, 108, 0.1);
+            }
+            
+            .like-btn-single .fas.fa-heart {
+                color: #ff416c;
+            }
+            
+            .like-btn-single .far.fa-heart {
+                color: #6c757d;
+            }
+            
+            /* Action Buttons Container */
+            .action-buttons-container {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+            
+            /* Pagination */
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 2.5rem;
+                padding-top: 2rem;
+                border-top: 2px solid #f0f0f0;
+            }
+            
+            .page-btn {
+                min-width: 38px;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0.5rem;
+                background: white;
+                border: 2px solid #e9ecef;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                font-size: 0.9rem;
+                text-decoration: none;
+                color: #495057;
+            }
+            
+            .page-btn:hover {
+                border-color: #daa520;
+                color: #daa520;
+                text-decoration: none;
+            }
+            
+            .page-btn.active {
+                background: #daa520;
+                border-color: #daa520;
+                color: white;
+            }
+            
+            /* Empty State */
+            .empty-state {
+                text-align: center;
+                padding: 3rem 2rem;
+                background: white;
+                border-radius: 1rem;
+                border: 2px dashed #e9ecef;
+                margin: 2rem 0;
+            }
+            
+            .empty-icon {
+                font-size: 3rem;
+                color: #6c757d;
+                margin-bottom: 1.25rem;
+            }
+            
+            /* Mobile Filters Toggle */
+            .mobile-filters-btn {
+                display: none;
+                background: linear-gradient(135deg, #daa520, #b8860b);
+                color: white;
+                border: none;
+                padding: 0.9rem 1.5rem;
+                border-radius: 0.75rem;
+                font-weight: 600;
+                cursor: pointer;
+                margin-bottom: 1.5rem;
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 1rem;
+                font-family: inherit;
+            }
+            
+            @media (max-width: 1200px) {
+                .mobile-filters-btn {
+                    display: flex;
+                }
+            }
+            
+            /* Close button for mobile filters */
+            .close-filters-btn {
+                display: none;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            
+            @media (max-width: 1200px) {
+                .close-filters-btn {
+                    display: block;
+                }
+            }
+            
+            /* Responsive */
+            @media (max-width: 992px) {
+                .browse-hero h1 {
+                    font-size: 1.8rem;
+                }
+                
+                .hero-subtitle {
+                    font-size: 0.95rem;
+                }
+                
+                .designs-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                    gap: 1.5rem;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .browse-hero {
+                    padding: 2rem 1rem;
+                }
+                
+                .browse-hero h1 {
+                    font-size: 1.6rem;
+                }
+                
+                .search-bar {
+                    flex-direction: column;
+                    padding: 1rem;
+                }
+                
+                .search-input {
+                    width: 100%;
+                }
+                
+                .btn-search {
+                    width: 100%;
+                }
+                
+                .designs-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1.25rem;
+                }
+                
+                .results-header {
+                    flex-direction: column;
+                    gap: 1rem;
+                    align-items: flex-start;
+                }
+                
+                .card-image-wrapper {
+                    height: 220px;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="browse-container">
+            <!-- Compact Hero Header -->
+            <section class="browse-hero">
+                <h1>Discover Timeless Art</h1>
+                <p class="hero-subtitle">
+                    Explore #{browseDesignsBean.totalDesigns} unique designs from world-class artists
+                </p>
+                <div class="stats-badge">
+                    <i class="fas fa-palette"></i> #{browseDesignsBean.totalDesigns} Designs Available
+                </div>
+            </section>
+
+            <!-- Search Bar -->
+            <div class="search-bar-container">
+                <h:form id="searchForm">
+                    <div class="search-bar">
+                        <p:inputText value="#{browseDesignsBean.searchKeyword}" 
+                                    placeholder="Search designs, artists, styles, or keywords..." 
+                                    styleClass="search-input"
+                                    id="keywordInput" />
+                        <h:commandButton value="Search Designs" styleClass="btn-search" 
+                                        action="#{browseDesignsBean.searchDesigns}">
+                            <i class="fas fa-search"></i>
+                            <f:ajax execute="searchForm" render="mainForm"/>
+                        </h:commandButton>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Mobile Filters Toggle -->
+            <button type="button" class="mobile-filters-btn" onclick="toggleFilters()">
+                <i class="fas fa-filter"></i> Filter Designs
+            </button>
+
+            <h:form id="mainForm">
+                <p:growl id="growl" showDetail="true" life="2500" />
+
+                <div class="main-layout">
+                    <!-- Filters Sidebar -->
+                    <aside class="filters-sidebar" id="filtersSidebar">
+                        <button type="button" class="close-filters-btn" onclick="toggleFilters()">
+                            ×
+                        </button>
+                        
+                        <div class="filter-header">
+                            <h3 style="margin: 0; font-size: 1.2rem;">Filters</h3>
+                            <h:commandButton value="Clear All" styleClass="btn-clear" 
+                                            action="#{browseDesignsBean.clearFilters}">
+                                <f:ajax execute="mainForm" render="mainForm"/>
+                            </h:commandButton>
+                        </div>
+
+                        <!-- Style Filter -->
+                        <div class="filter-section">
+                            <h4 class="filter-title">
+                                <i class="fas fa-paint-brush"></i> Style
+                            </h4>
+                            <h:selectOneMenu value="#{browseDesignsBean.selectedStyle}" 
+                                           styleClass="style-select"
+                                           id="styleSelect">
+                                <f:selectItem itemValue="" itemLabel="All Styles" />
+                                <f:selectItems value="#{browseDesignsBean.availableStyles}" 
+                                             var="style" itemValue="#{style}" itemLabel="#{style}"/>
+                                <f:ajax execute="@this" listener="#{browseDesignsBean.searchDesigns}" 
+                                       render="mainForm"/>
+                            </h:selectOneMenu>
+                        </div>
+
+                        <!-- Price Filter -->
+                        <div class="filter-section">
+                            <h4 class="filter-title">
+                                <i class="fas fa-tag"></i> Price Range
+                            </h4>
+                            <div class="price-inputs">
+                                <p:inputText value="#{browseDesignsBean.minPrice}" 
+                                            placeholder="Min ₹" 
+                                            styleClass="price-input"
+                                            id="minPrice" />
+                                <br/>
+                                <p:inputText value="#{browseDesignsBean.maxPrice}" 
+                                            placeholder="Max ₹" 
+                                            styleClass="price-input"
+                                            id="maxPrice" />
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h:commandButton value="Apply Price Filter" styleClass="btn-search"
+                                                action="#{browseDesignsBean.searchDesigns}">
+                                    <i class="fas fa-check"></i>
+                                    <f:ajax execute="mainForm" render="mainForm"/>
+                                </h:commandButton>
+                            </div>
+                        </div>
+
+                        <!-- Sort Options - FIXED -->
+                        <div class="filter-section">
+                            <h4 class="filter-title">
+                                <i class="fas fa-sort-amount-down"></i> Sort By
+                            </h4>
+                            <div class="sort-options">
+                                <h:commandLink styleClass="sort-option #{browseDesignsBean.sortBy == 'newest' ? 'active' : ''}"
+                                              action="#{browseDesignsBean.setSortBy('newest')}">
+                                    <i class="fas fa-clock"></i> Newest First
+                                    <f:ajax execute="mainForm" render="mainForm"/>
+                                </h:commandLink>
+                                <h:commandLink styleClass="sort-option #{browseDesignsBean.sortBy == 'popular' ? 'active' : ''}"
+                                              action="#{browseDesignsBean.setSortBy('popular')}">
+                                    <i class="fas fa-fire"></i> Most Popular
+                                    <f:ajax execute="mainForm" render="mainForm"/>
+                                </h:commandLink>
+                                <h:commandLink styleClass="sort-option #{browseDesignsBean.sortBy == 'price_low' ? 'active' : ''}"
+                                              action="#{browseDesignsBean.setSortBy('price_low')}">
+                                    <i class="fas fa-sort-amount-down-alt"></i> Price: Low to High
+                                    <f:ajax execute="mainForm" render="mainForm"/>
+                                </h:commandLink>
+                                <h:commandLink styleClass="sort-option #{browseDesignsBean.sortBy == 'price_high' ? 'active' : ''}"
+                                              action="#{browseDesignsBean.setSortBy('price_high')}">
+                                    <i class="fas fa-sort-amount-down"></i> Price: High to Low
+                                    <f:ajax execute="mainForm" render="mainForm"/>
+                                </h:commandLink>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Designs Section -->
+                    <main class="designs-section">
+                        <div class="results-header">
+                            <div class="results-count">
+                                <!-- FIXED: Shows actual count -->
+                                <span>#{browseDesignsBean.designs.size()}</span> Designs Found
+                            </div>
+                            <div class="grid-toggle">
+                                <!-- FIXED: Grid buttons with proper onclick -->
+                                <button type="button" class="grid-btn active" onclick="setGridLayout()">
+                                    <i class="fas fa-th-large"></i>
+                                </button>
+                                <button type="button" class="grid-btn" onclick="setListLayout()">
+                                    <i class="fas fa-th-list"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h:panelGroup rendered="#{not empty browseDesignsBean.designs}">
+                            <!-- Pinterest Style Grid -->
+                            <div class="designs-grid" id="designsGrid">
+                                <ui:repeat value="#{browseDesignsBean.designs}" var="design">
+                                    <div class="design-card">
+                                       
+                                        <!-- Image Section -->
+                                        <div class="card-image-wrapper">
+                                            <h:link outcome="/web/client/design.xhtml" style="display: block; height: 100%;">
+                                                <f:param name="id" value="#{design.designId}" />
+                                                <h:graphicImage
+                                                    value="#{design.imagePath != null and design.imagePath.startsWith('http') 
+                                                             ? design.imagePath 
+                                                             : facesContext.externalContext.request.contextPath.concat('/uploads/').concat(design.imagePath)}"
+                                                    rendered="#{not empty design.imagePath}"
+                                                    styleClass="card-image"
+                                                    alt="#{design.title}" />
+
+                                                <h:graphicImage
+                                                    rendered="#{empty design.imagePath}"
+                                                    value="https://images.unsplash.com/photo-1605649487212-2bd9a18c1bab?auto=format&amp;fit=crop&amp;w=400&amp;q=80"
+                                                    styleClass="card-image" />
+                                            </h:link>
+                                            
+                                            <!-- Hover Overlay - REMOVED "Like" button, only View button -->
+                                            <div class="card-overlay">
+                                                <div class="card-actions">
+                                                    <!-- View Button Only -->
+                                                    <h:link value="View Details" outcome="/web/client/design.xhtml" 
+                                                           styleClass="action-btn view-btn">
+                                                        <i class="fas fa-eye"></i>
+                                                        <f:param name="id" value="#{design.designId}" />
+                                                    </h:link>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Content Section -->
+                                        <div class="card-content">
+                                            <div class="card-header">
+                                                <h4 class="card-title">#{design.title}</h4>
+                                                <div class="card-price">
+                                                    ₹#{not empty design.price ? design.price : 'Custom'}
+                                                </div>
+                                            </div>
+
+                                            <p class="card-description">
+                                                #{design.description != null and design.description.length() gt 100 ? 
+                                                  design.description.substring(0,100) + '...' : design.description}
+                                            </p>
+
+                                            <!-- Style Badge -->
+                                            <div style="margin-bottom: 0.75rem;">
+                                                <span class="style-badge">
+                                                    #{design.style != null ? design.style : 'Traditional'}
+                                                </span>
+                                            </div>
+
+                                            <!-- Stats - Shows live counts -->
+                                            <div class="card-stats">
+                                                <div class="stat-item #{browseDesignsBean.isLiked(design.designId) ? 'liked' : ''}">
+                                                    <i class="fas fa-heart"></i>
+                                                    <span id="likeCount_#{design.designId}">
+                                                        #{design.likes != null ? design.likes.size() : 0}
+                                                    </span>
+                                                </div>
+                                                <div class="stat-item #{browseDesignsBean.isFavourite(design.designId) ? 'favourited' : ''}">
+                                                    <i class="fas fa-star"></i>
+                                                    <span id="favouriteCount_#{design.designId}">
+                                                        #{design.favourites != null ? design.favourites.size() : 0}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Artist Info -->
+                                            <div class="card-footer">
+                                                <div class="artist-info">
+                                                    <div class="artist-avatar">
+                                                        #{design.artist.fullName != null ? design.artist.fullName.substring(0,1).toUpperCase() : 'A'}
+                                                    </div>
+                                                    <div>
+                                                        <div class="artist-name">#{design.artist.fullName}</div>
+                                                        <div style="font-size: 0.75rem; color: #6c757d;">Artist</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- TWO SEPARATE BUTTONS: Like (Heart) and Favourite (Star) -->
+                                                <div class="action-buttons-container">
+                                                    <!-- ❤️ Heart Button for Like -->
+                                                    <h:commandButton styleClass="like-btn-single"
+                                                                    rendered="#{userSessionBean.loggedIn and userSessionBean.isClient()}"
+                                                                    action="#{browseDesignsBean.toggleLike(design.designId)}">
+                                                        <i class="#{browseDesignsBean.isLiked(design.designId) ? 'fas' : 'far'} fa-heart"></i>
+                                                        <f:ajax execute="@form" render="@form" 
+                                                               onevent="updateLikeCount(#{design.designId}, #{browseDesignsBean.isLiked(design.designId)})" />
+                                                    </h:commandButton>
+                                                    
+                                                    <!-- ⭐ Star Button for Favourite -->
+                                                    <h:commandButton styleClass="favourite-btn"
+                                                                    rendered="#{userSessionBean.loggedIn and userSessionBean.isClient()}"
+                                                                    action="#{browseDesignsBean.toggleFavourite(design.designId)}">
+                                                        <i class="#{browseDesignsBean.isFavourite(design.designId) ? 'fas' : 'far'} fa-star"></i>
+                                                        <f:ajax execute="@form" render=":growl, @form"
+                                                               onevent="updateFavouriteCount(#{design.designId}, #{browseDesignsBean.isFavourite(design.designId)})" />
+                                                    </h:commandButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div class="pagination">
+                                <h:commandLink styleClass="page-btn" 
+                                              action="#{browseDesignsBean.goToPage(browseDesignsBean.currentPage - 1)}"
+                                              rendered="#{browseDesignsBean.currentPage gt 1}">
+                                    <i class="fas fa-chevron-left"></i> Prev
+                                    <f:ajax execute="@form" render="mainForm"/>
+                                </h:commandLink>
+
+                                <ui:repeat value="#{browseDesignsBean.pageNumbers}" var="p">
+                                    <h:commandLink styleClass="page-btn #{p eq browseDesignsBean.currentPage ? 'active' : ''}"
+                                                  action="#{browseDesignsBean.goToPage(p)}">
+                                        #{p}
+                                        <f:ajax execute="@form" render="mainForm"/>
+                                    </h:commandLink>
+                                </ui:repeat>
+
+                                <h:commandLink styleClass="page-btn" 
+                                              action="#{browseDesignsBean.goToPage(browseDesignsBean.currentPage + 1)}"
+                                              rendered="#{browseDesignsBean.currentPage lt browseDesignsBean.totalPages}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                    <f:ajax execute="@form" render="mainForm"/>
+                                </h:commandLink>
+                            </div>
+                        </h:panelGroup>
+
+                        <!-- Empty State -->
+                        <h:panelGroup rendered="#{empty browseDesignsBean.designs}">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h3>No Designs Found</h3>
+                                <p style="max-width: 400px; margin: 1rem auto 2rem auto;">
+                                    Try adjusting your search filters or browse our popular designs
+                                </p>
+                                <h:commandButton value="Clear All Filters" styleClass="btn-search"
+                                                action="#{browseDesignsBean.clearFilters}">
+                                    <i class="fas fa-times"></i>
+                                    <f:ajax execute="@form" render="mainForm"/>
+                                </h:commandButton>
+                            </div>
+                        </h:panelGroup>
+                    </main> 
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+    <ui:define name="scripts">
+        <script type="text/javascript">
+            //<![CDATA[
+            function toggleFilters() {
+                const sidebar = document.getElementById('filtersSidebar');
+                if (sidebar) {
+                    if (sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                        document.body.style.overflow = 'auto';
+                    } else {
+                        sidebar.classList.add('show');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }
+            
+            // Close filters when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('filtersSidebar');
+                const mobileBtn = document.querySelector('.mobile-filters-btn');
+                const closeBtn = document.querySelector('.close-filters-btn');
+                
+                if (sidebar && sidebar.classList.contains('show') && 
+                    !sidebar.contains(event.target) && 
+                    event.target !== mobileBtn && 
+                    !mobileBtn.contains(event.target) &&
+                    event.target !== closeBtn) {
+                    sidebar.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            // Grid/List layout toggle functions - FIXED
+            function setGridLayout() {
+                const grid = document.getElementById('designsGrid');
+                const gridBtns = document.querySelectorAll('.grid-btn');
+                
+                if (grid) {
+                    grid.classList.remove('list-layout');
+                    grid.classList.add('grid-layout');
+                    // Update styles for grid layout
+                    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(260px, 1fr))';
+                }
+                
+                gridBtns[0].classList.add('active');
+                gridBtns[1].classList.remove('active');
+            }
+            
+            function setListLayout() {
+                const grid = document.getElementById('designsGrid');
+                const gridBtns = document.querySelectorAll('.grid-btn');
+                
+                if (grid) {
+                    grid.classList.remove('grid-layout');
+                    grid.classList.add('list-layout');
+                    // Update styles for list layout
+                    grid.style.gridTemplateColumns = '1fr';
+                }
+                
+                gridBtns[0].classList.remove('active');
+                gridBtns[1].classList.add('active');
+            }
+
+            // Enter key to trigger search
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchForm:keywordInput');
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', function(event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            // Trigger the search button click
+                            const searchBtn = searchInput.closest('form').querySelector('.btn-search');
+                            if (searchBtn) {
+                                searchBtn.click();
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Update like count dynamically
+            function updateLikeCount(designId, isLiked) {
+                const likeCountElement = document.getElementById('likeCount_' + designId);
+                if (likeCountElement) {
+                    let currentCount = parseInt(likeCountElement.textContent) || 0;
+                    if (isLiked) {
+                        // If now liked, increase count
+                        likeCountElement.textContent = currentCount + 1;
+                    } else {
+                        // If now unliked, decrease count (but not below 0)
+                        likeCountElement.textContent = Math.max(0, currentCount - 1);
+                    }
+                }
+            }
+            
+            // Update favourite count dynamically
+            function updateFavouriteCount(designId, isFavourited) {
+                const favouriteCountElement = document.getElementById('favouriteCount_' + designId);
+                if (favouriteCountElement) {
+                    let currentCount = parseInt(favouriteCountElement.textContent) || 0;
+                    if (isFavourited) {
+                        // If now favourited, increase count
+                        favouriteCountElement.textContent = currentCount + 1;
+                    } else {
+                        // If now unfavourited, decrease count (but not below 0)
+                        favouriteCountElement.textContent = Math.max(0, currentCount - 1);
+                    }
+                }
+            }
+            
+            // Show notification for favourite toggle
+            function showFavouriteNotification(isFavourited) {
+                if (isFavourited) {
+                    // This will be shown by PrimeFaces growl
+                    console.log('Added to favourites');
+                } else {
+                    console.log('Removed from favourites');
+                }
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>

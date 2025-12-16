@@ -1,0 +1,253 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+                template="/web/artist/templates/layout.xhtml">
+
+
+    <ui:define name="title">My Appointments — InkFlow</ui:define>
+    <ui:define name="pageTitle">My Appointments</ui:define>
+    <style>
+    /* -------- Status Pills -------- */
+.status-pill {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+}
+
+/* Known statuses */
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Payment-related */
+.status-paid {
+    background: #cce5ff;
+    color: #004085;
+}
+
+/* Fallback for ANY unknown future status */
+.status-pill:not(
+    .status-pending,
+    .status-confirmed,
+    .status-completed,
+    .status-cancelled,
+    .status-paid
+) {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+        </style>
+    <ui:define name="content">
+
+        <!-- MAIN FORM -->
+        <h:form id="appointmentForm">
+
+            <p:growl id="msg" showDetail="true" />
+
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <h2>My Appointments</h2>
+                <p class="muted">Manage and respond to your client bookings</p>
+            </section>
+
+            <!-- Table Section -->
+            <section class="table-section">
+
+                <div class="table-header">
+                    <h3>Appointment List</h3>
+
+                    <!-- Status Filter -->
+                    <p:selectOneMenu value="#{artistAppointmentBean.filter.status}"
+                                     style="width:180px">
+                        <f:selectItem itemLabel="All Status" itemValue="ALL" />
+                        <f:selectItem itemLabel="Pending" itemValue="PENDING" />
+                        <f:selectItem itemLabel="Confirmed" itemValue="CONFIRMED" />
+                        <f:selectItem itemLabel="Completed" itemValue="COMPLETED" />
+                        <f:selectItem itemLabel="Cancelled" itemValue="CANCELLED" />
+                        <p:ajax listener="#{artistAppointmentBean.loadAppointments}"
+                                update="appointmentTable" />
+                    </p:selectOneMenu>
+                </div>
+
+                <p:dataTable id="appointmentTable"
+                             value="#{artistAppointmentBean.appointments}"
+                             var="a"
+                             paginator="true"
+                             rows="6"
+                             emptyMessage="No appointments found."
+                             styleClass="design-table">
+
+                    <!-- Client -->
+                    <p:column headerText="Client">
+                        <strong>#{a.clientName}</strong><br/>
+                        <span class="muted">#{a.clientEmail}</span>
+                    </p:column>
+
+                    <!-- Design -->
+                    <p:column headerText="Design">
+                        <h:panelGroup rendered="#{not empty a.designTitle}">
+                            #{a.designTitle}
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{empty a.designTitle}">
+                            <span class="muted">Custom / Walk-in</span>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <!-- Date -->
+                    <p:column headerText="Date &amp; Time" style="width:160px;">
+                       <h:outputText value="#{a.appointmentDateFormatted}" />
+
+                    </p:column>
+
+                    <!-- Status -->
+                   <p:column headerText="Status" style="width:140px; text-align:center;">
+
+    <span class="status-pill status-#{fn:toLowerCase(a.status)}">
+        #{a.status}
+    </span>
+
+</p:column>
+
+
+                    <!-- Payment -->
+                    <p:column headerText="Payment" style="width:110px; text-align:center;">
+                        <h:panelGroup rendered="#{empty a.paymentStatus}">
+                            <span class="muted">—</span>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{not empty a.paymentStatus}">
+                            <span class="badge badge-success"
+                                  rendered="#{a.paymentStatus eq 'PAID'}">
+                                ₹ #{a.amount}
+                            </span>
+                            <span class="badge badge-warning"
+                                  rendered="#{a.paymentStatus ne 'PAID'}">
+                                #{a.paymentStatus}
+                            </span>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <!-- Actions -->
+                    <p:column headerText="Actions" style="width:180px; text-align:center;">
+
+                        <!-- Confirm -->
+                        <p:commandButton icon="pi pi-check"
+                                         title="Confirm Appointment"
+                                         styleClass="ui-button-rounded ui-button-text ui-button-success"
+                                         rendered="#{a.status eq 'PENDING'}"
+                                         actionListener="#{artistAppointmentBean.confirmAppointment(a)}"
+                                         update=":appointmentForm:appointmentTable :appointmentForm:msg"/>
+
+                        <!-- Assign Slot -->
+                        <p:commandButton icon="pi pi-calendar"
+                 title="Assign Slot"
+                 styleClass="ui-button-rounded ui-button-text ui-button-secondary"
+                 rendered="#{a.status eq 'PENDING'}"
+                 actionListener="#{artistAppointmentBean.prepareSlotAssign(a)}"
+                 update=":slotDialog :appointmentForm:msg"
+                 oncomplete="PF('slotDlg').show()"/>
+
+
+                        <!-- Cancel -->
+                        <p:commandButton icon="pi pi-times"
+                                         title="Cancel Appointment"
+                                         styleClass="ui-button-rounded ui-button-text ui-button-danger"
+                                         rendered="#{a.status ne 'COMPLETED' and a.status ne 'CANCELLED'}"
+                                         actionListener="#{artistAppointmentBean.prepareCancel(a)}"
+                                         update="cancelDialog"
+                                         oncomplete="PF('cancelDlg').show()"/>
+                    </p:column>
+
+                </p:dataTable>
+            </section>
+        </h:form>
+
+        <!-- SLOT ASSIGN DIALOG -->
+       <p:dialog id="slotDialog"
+          header="Assign Time Slot"
+          widgetVar="slotDlg"
+          modal="true"
+          dynamic="true"
+          appendTo="@(body)"
+          styleClass="dialog-clean">
+
+            <h:form id="slotForm">
+
+                <p:messages />
+
+                <p:selectOneMenu value="#{artistAppointmentBean.selectedSlotId}"
+                                 style="width:100%">
+                    <f:selectItems value="#{artistAppointmentBean.availableSlots}"
+                                   var="s"
+                                   itemValue="#{s.slotId}"
+                                   itemLabel="#{s.dateFormatted} #{s.startTimeFormatted} - #{s.endTimeFormatted}" />
+                </p:selectOneMenu>
+
+                <div class="dialog-actions">
+                    <p:commandButton value="Assign"
+                                     icon="pi pi-check"
+                                     action="#{artistAppointmentBean.assignSlot}"
+                                     update=":appointmentForm:appointmentTable :appointmentForm:msg"
+                                     oncomplete="PF('slotDlg').hide()" />
+
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     styleClass="ui-button-secondary"
+                                     immediate="true"
+                                     onclick="PF('slotDlg').hide(); return false;" />
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- CANCEL DIALOG -->
+        <p:dialog id="cancelDialog"
+                  header="Cancel Appointment"
+                  widgetVar="cancelDlg"
+                  modal="true"
+                  appendTo="@(body)"
+                  styleClass="dialog-clean">
+
+            <h:form id="cancelForm">
+
+                <p:inputTextarea value="#{artistAppointmentBean.cancellationReason}"
+                 rows="3"
+                 placeholder="Reason for cancellation"
+                 required="true"/>
+
+                <div class="dialog-actions">
+                    <p:commandButton value="Confirm Cancel"
+                                     icon="pi pi-times"
+                                     styleClass="ui-button-danger"
+action="#{artistAppointmentBean.cancelAppointment}"
+                                     update=":appointmentForm:appointmentTable :appointmentForm:msg"
+                                     oncomplete="PF('cancelDlg').hide()" />
+                </div>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

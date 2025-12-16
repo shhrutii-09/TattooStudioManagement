@@ -1,0 +1,120 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    template="/web/client/clientTemplate.xhtml">
+
+    <ui:define name="title">Book Appointment</ui:define>
+
+    <ui:define name="styles">
+        <style>
+            .profile-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem 1.5rem;
+            }
+
+            .artist-header {
+                display: flex;
+                gap: 2rem;
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                color: white;
+                padding: 2rem;
+                border-radius: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .artist-avatar {
+                width: 110px;
+                height: 110px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #daa520, #b8860b);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 3rem;
+                font-weight: 700;
+            }
+
+            .submit-btn {
+                margin-top: 1rem;
+                width: 100%;
+                background: linear-gradient(135deg, #daa520, #b8860b);
+                color: white;
+                border: none;
+                padding: 0.8rem;
+                border-radius: 0.75rem;
+                font-weight: 700;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="bookingForm">
+
+            <!-- ✅ MESSAGE FEEDBACK -->
+            <p:messages id="msgs" showDetail="true"/>
+
+            <h3>Book Appointment</h3>
+
+            <p><b>Design:</b> #{bookAppointmentBean.dto.designTitle}</p>
+            <p><b>Artist:</b> #{bookAppointmentBean.dto.artistName}</p>
+            <p><b>Price:</b> ₹#{bookAppointmentBean.dto.price}</p>
+
+            
+
+            <!-- Medical form -->
+            <h3>Medical Form</h3>
+
+            <p:inputTextarea value="#{bookAppointmentBean.dto.allergyDetails}"
+                             placeholder="Allergy details (if any)"
+                             rows="3"
+                             style="width:100%" />
+
+            <br/>
+
+            <p:selectBooleanCheckbox value="#{bookAppointmentBean.dto.diabetes}" />
+            Diabetes
+
+            <br/>
+
+            <p:selectBooleanCheckbox value="#{bookAppointmentBean.dto.heartCondition}" />
+            Heart Condition
+
+            <br/>
+
+            <p:selectBooleanCheckbox value="#{bookAppointmentBean.dto.isPregnant}" />
+            Pregnant
+
+            <br/>
+
+            <!-- ✅ CHECKBOX WITH AJAX (REQUIRED) -->
+            <p:selectBooleanCheckbox value="#{bookAppointmentBean.dto.above18}">
+                <p:ajax update="@form" />
+            </p:selectBooleanCheckbox>
+            I am above 18 years old
+
+            <br/>
+
+            <!-- ✅ CHECKBOX WITH AJAX (REQUIRED) -->
+            <p:selectBooleanCheckbox value="#{bookAppointmentBean.dto.consentGiven}">
+                <p:ajax update="@form" />
+            </p:selectBooleanCheckbox>
+            I give consent for the tattoo procedure
+
+            <p:divider />
+
+            <!-- ✅ FIXED CONFIRM BUTTON -->
+           <p:commandButton value="Confirm Booking"
+                 styleClass="submit-btn"
+                 action="#{bookAppointmentBean.submitBooking}"
+                 ajax="false" />
+
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

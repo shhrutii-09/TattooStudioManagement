@@ -252,54 +252,54 @@ public Response getAvailableSlots(@PathParam("artistId") Long artistId,
      * POST /api/client/appointments/book
      * body: { "clientId": 3, "artistId": 2, "designId": 5, "slotId": 10, "note": "..." }
      */
-    @POST
-@Path("/appointments/book")
-public Response bookAppointment(Map<String, Object> data) {
-    try {
-        // Safe parsing of required fields
-        Long clientId = Long.parseLong(data.get("clientId").toString());
-        Long artistId = Long.parseLong(data.get("artistId").toString());
-        Integer slotId = Integer.parseInt(data.get("slotId").toString());
-        
-        // Optional fields
-        Long designId = data.get("designId") != null ? Long.parseLong(data.get("designId").toString()) : null;
-        String clientNote = (String) data.getOrDefault("clientNote", "");
-
-        Long appointmentId = clientEJB.bookAppointment(clientId, artistId, designId, slotId, clientNote);
-
-        return Response.status(Response.Status.CREATED)
-                .entity(Map.of("appointmentId", appointmentId, "message", "Appointment booked successfully (PENDING)."))
-                .build();
-
-    } catch (IllegalStateException | IllegalArgumentException ex) {
-        // Catches the CRITICAL double-booking failure from the EJB (IllegalStateException)
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity(Map.of("error", ex.getMessage()))
-                .build();
-    } catch (Exception ex) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(Map.of("error", "Failed to book appointment: " + ex.getMessage()))
-                .build();
-    }
-}
+//    @POST
+//@Path("/appointments/book")
+//public Response bookAppointment(Map<String, Object> data) {
+//    try {
+//        // Safe parsing of required fields
+//        Long clientId = Long.parseLong(data.get("clientId").toString());
+//        Long artistId = Long.parseLong(data.get("artistId").toString());
+//        Integer slotId = Integer.parseInt(data.get("slotId").toString());
+//        
+//        // Optional fields
+//        Long designId = data.get("designId") != null ? Long.parseLong(data.get("designId").toString()) : null;
+//        String clientNote = (String) data.getOrDefault("clientNote", "");
+//
+////        Long appointmentId = clientEJB.bookAppointment(clientId, artistId, designId, slotId, clientNote);
+//
+//        return Response.status(Response.Status.CREATED)
+//                .entity(Map.of("appointmentId", appointmentId, "message", "Appointment booked successfully (PENDING)."))
+//                .build();
+//
+//    } catch (IllegalStateException | IllegalArgumentException ex) {
+//        // Catches the CRITICAL double-booking failure from the EJB (IllegalStateException)
+//        return Response.status(Response.Status.BAD_REQUEST)
+//                .entity(Map.of("error", ex.getMessage()))
+//                .build();
+//    } catch (Exception ex) {
+//        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//                .entity(Map.of("error", "Failed to book appointment: " + ex.getMessage()))
+//                .build();
+//    }
+//}
 
     /**
      * POST /api/client/appointments/{id}/cancel
      * body: { "reason": "..." }
      */
-    @POST
-    @Path("/appointments/{id}/cancel")
-    public Response cancelAppointment(@PathParam("id") Long appointmentId, Map<String, Object> body) {
-        try {
-            String reason = body.getOrDefault("reason", "").toString();
-            clientEJB.cancelAppointment(appointmentId, reason);
-            return Response.ok(Map.of("success", true)).build();
-        } catch (IllegalArgumentException iae) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("error", iae.getMessage())).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Map.of("error", e.getMessage())).build();
-        }
-    }
+//    @POST
+//    @Path("/appointments/{id}/cancel")
+//    public Response cancelAppointment(@PathParam("id") Long appointmentId, Map<String, Object> body) {
+//        try {
+//            String reason = body.getOrDefault("reason", "").toString();
+//            clientEJB.cancelAppointment(appointmentId, reason);
+//            return Response.ok(Map.of("success", true)).build();
+//        } catch (IllegalArgumentException iae) {
+//            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("error", iae.getMessage())).build();
+//        } catch (Exception e) {
+//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Map.of("error", e.getMessage())).build();
+//        }
+//    }
 
     /**
      * GET /api/client/appointments/{clientId}
@@ -530,4 +530,6 @@ public Response bookAppointment(Map<String, Object> data) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Map.of("error", e.getMessage())).build();
         }
     }
+    
+    
 }

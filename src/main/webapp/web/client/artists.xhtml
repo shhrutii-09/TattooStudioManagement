@@ -1,0 +1,98 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="/web/client/clientTemplate.xhtml">
+
+
+    <ui:define name="title">Browse Artists</ui:define>
+
+    <ui:define name="content">
+
+        <style>
+            .artist-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 24px;
+                max-width: 1200px;
+                margin: auto;
+            }
+
+            .artist-card {
+                background: white;
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+                transition: transform .3s, box-shadow .3s;
+            }
+
+            .artist-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+            }
+
+            .artist-avatar {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                background: linear-gradient(135deg,#667eea,#764ba2);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                font-weight: bold;
+                margin-bottom: 12px;
+            }
+
+            .rating {
+                color: #f1c40f;
+                font-weight: 600;
+            }
+        </style>
+
+        <h2 style="text-align:center; margin-bottom:30px;">
+            Browse Artists
+        </h2>
+
+        <div class="artist-grid">
+
+            <ui:repeat value="#{artistsBrowseBean.artists}" var="a">
+
+                <div class="artist-card">
+
+                    <div class="artist-avatar">
+                        #{a.fullName.substring(0,1)}
+                    </div>
+
+                    <h3 style="margin:8px 0;">
+                        #{a.fullName}
+                    </h3>
+
+                    <p>
+                        Experience:
+                        <b>
+                            #{a.yearsExperience != null ? a.yearsExperience : 0} yrs
+                        </b>
+                    </p>
+
+                    <p class="rating">
+                        ★ #{a.averageRating} / 5
+                        (#{a.totalReviews})
+                    </p>
+
+                    <h:link outcome="/web/client/artist.xhtml"
+                            style="text-decoration:none; font-weight:600;">
+                        <f:param name="id" value="#{a.artistId}" />
+                        View Profile →
+                    </h:link>
+
+                </div>
+
+            </ui:repeat>
+
+        </div>
+
+    </ui:define>
+</ui:composition>

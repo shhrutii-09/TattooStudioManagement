@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+xmlns:h="http://xmlns.jcp.org/jsf/html"
+xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+xmlns:p="http://primefaces.org/ui">
+
+
+<header class="topbar">
+<div class="topbar-left">
+<button class="menu-toggle" type="button"
+onclick="document.body.classList.toggle('collapsed')">
+<i class="pi pi-bars"></i>
+</button>
+<div class="page-title"><ui:insert name="pageTitle">Artist</ui:insert></div>
+</div>
+
+
+<div class="topbar-right">
+<div class="admin-info">
+<ui:fragment rendered="#{userSessionBean.loggedIn}">
+<div style="display:flex;flex-direction:column;align-items:flex-end;">
+<span class="admin-name">#{userSessionBean.username}</span>
+<span style="font-size:0.8rem;color:#c7a45b;">Artist</span>
+</div>
+<h:link outcome="profile.xhtml" styleClass="nav-icon">
+<i class="pi pi-user" style="color:#c7a45b"></i>
+</h:link>
+</ui:fragment>
+</div>
+
+
+<ui:fragment rendered="#{userSessionBean.loggedIn}">
+<h:form prependId="false">
+<p:commandButton value="Logout"
+action="#{loginBean.logout}"
+icon="pi pi-sign-out"
+ajax="false"
+styleClass="btn-logout" />
+</h:form>
+</ui:fragment>
+</div>
+</header>
+</ui:composition>

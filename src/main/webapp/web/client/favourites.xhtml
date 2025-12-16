@@ -1,0 +1,215 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    template="/web/client/clientTemplate.xhtml">
+
+    <ui:define name="title">
+        My Saved Designs
+    </ui:define>
+
+    <ui:define name="content">
+
+        <!-- ======================= STYLES ======================= -->
+        <style>
+            .page-wrapper {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            .card {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                padding: 24px;
+                margin-bottom: 24px;
+                border: 1px solid #e9ecef;
+            }
+
+            .design-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 24px;
+            }
+
+            .design-card {
+                border: 1px solid #e9ecef;
+                border-radius: 12px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            .design-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+            }
+
+            .design-img {
+                width: 100%;
+                height: 220px;
+                object-fit: cover;
+                background: #f8f9fa;
+            }
+
+            .design-info {
+                padding: 16px;
+            }
+
+            .style-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+
+            .price {
+                font-weight: 700;
+                color: #212529;
+                margin: 8px 0;
+            }
+
+            .btn-row {
+                display: flex;
+                gap: 10px;
+                margin-top: 14px;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 10px 18px;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 13px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                transition: all 0.3s ease;
+                border: none;
+            }
+
+            .btn-view {
+                background: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+                color: white;
+            }
+
+            .btn-view:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(51,154,240,0.3);
+            }
+
+            .btn-book {
+                background: linear-gradient(135deg, #40c057 0%, #2f9e44 100%);
+                color: white;
+            }
+
+            .btn-book:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(47,158,68,0.3);
+            }
+
+            .empty-box {
+                text-align: center;
+                padding: 60px 20px;
+                color: #6c757d;
+                font-size: 18px;
+                border: 2px dashed #ced4da;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            }
+
+            h2 {
+                margin-bottom: 20px;
+                font-size: 28px;
+                font-weight: 700;
+            }
+        </style>
+
+        <div class="page-wrapper">
+            <h:form>
+
+                <div class="card">
+                    <h2>⭐ My Saved Designs</h2>
+
+                    <!-- ===== EMPTY STATE ===== -->
+                    <h:panelGroup rendered="#{empty favouriteDesignBean.favourites}">
+                        <div class="empty-box">
+                            You haven’t saved any designs yet.<br/><br/>
+                            <h:link outcome="/web/client/home.xhtml"
+                                    styleClass="btn btn-view">
+                                Browse Designs
+                            </h:link>
+                        </div>
+                    </h:panelGroup>
+
+                    <!-- ===== FAVOURITES GRID ===== -->
+                    <h:panelGroup rendered="#{not empty favouriteDesignBean.favourites}">
+                        <div class="design-grid">
+
+                            <ui:repeat value="#{favouriteDesignBean.favourites}" var="d">
+                                <div class="design-card">
+
+                                    <h:graphicImage
+                                        value="#{d.imagePath}"
+                                        styleClass="design-img"
+                                        alt="#{d.title}"/>
+
+                                    <div class="design-info">
+
+                                        <span class="style-badge">
+                                            #{d.style}
+                                        </span>
+
+                                        <h4 style="margin:6px 0;">
+                                            #{d.title}
+                                        </h4>
+
+                                        <div style="color:#6c757d; font-size:14px;">
+                                            by #{d.artistName}
+                                        </div>
+
+                                        <div class="price">
+                                            #{not empty d.price ? '₹' += d.price : 'Custom Quote'}
+                                        </div>
+
+                                        <div class="btn-row">
+
+                                            <!-- VIEW DESIGN -->
+                                            <h:link outcome="/web/client/design.xhtml"
+        styleClass="btn btn-view">
+    <f:param name="id" value="#{d.designId}" />
+    👁 View
+</h:link>
+
+
+                                            <!-- BOOK APPOINTMENT -->
+                                            <h:commandLink
+                                                action="#{favouriteDesignBean.bookAppointment(d.artistId, d.designId)}"
+                                                styleClass="btn btn-book">
+                                                📅 Book
+                                            </h:commandLink>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+
+                        </div>
+                    </h:panelGroup>
+
+                </div>
+            </h:form>
+        </div>
+
+    </ui:define>
+</ui:composition>

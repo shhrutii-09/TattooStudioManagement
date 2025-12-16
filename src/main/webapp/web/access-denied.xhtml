@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Access Denied - InkFlow</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="#{request.contextPath}/web/resources/css/app.css" />
+</h:head>
+
+<h:body style="background: #f8f9fa; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div style="text-align: center; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <i class="pi pi-lock" style="font-size: 4rem; color: #e74c3c;"></i>
+        <h2 style="color: #2c3e50; margin: 20px 0 10px;">Access Denied</h2>
+        <p style="color: #7f8c8d; margin-bottom: 30px; max-width: 400px;">
+            You don't have permission to access this page. 
+            This area is restricted to authorized users only.
+        </p>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <h:link outcome="/web/client/home.xhtml" styleClass="btn" style="background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                <i class="pi pi-home"></i> Go to Home
+            </h:link>
+            
+            <ui:fragment rendered="#{userSessionBean.loggedIn}">
+                <h:link outcome="/web/client/dashboard.xhtml" styleClass="btn" style="background: #2c3e50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                    <i class="pi pi-user"></i> My Dashboard
+                </h:link>
+            </ui:fragment>
+            
+            <ui:fragment rendered="#{not userSessionBean.loggedIn}">
+                <h:link outcome="/web/login.xhtml" styleClass="btn" style="background: #27ae60; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+                    <i class="pi pi-sign-in"></i> Login
+                </h:link>
+            </ui:fragment>
+        </div>
+        
+        <div style="margin-top: 30px; color: #95a5a6; font-size: 0.9em;">
+            <p>If you believe this is an error, please contact the administrator.</p>
+            <p>Error: 403 - Forbidden</p>
+        </div>
+    </div>
+</h:body>
+</html>

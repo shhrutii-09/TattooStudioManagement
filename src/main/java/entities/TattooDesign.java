@@ -22,6 +22,11 @@ public class TattooDesign implements Serializable {
     @JoinColumn(name = "ARTIST_ID", nullable = false)
     private AppUser artist;
 
+    @JsonbTransient
+@OneToMany(mappedBy = "design", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<DesignComment> comments;
+
+    
     @Column(name = "TITLE", nullable = false, length = 150)
     private String title;
 
@@ -39,6 +44,12 @@ public class TattooDesign implements Serializable {
 
     @Column(name = "UPLOADEDAT")
     private LocalDateTime uploadedAt = LocalDateTime.now();
+    
+    public String getShortDescription() {
+    if (description == null) return "";
+    return description.length() > 100 ? description.substring(0, 100) + "..." : description;
+}
+
     
 //    @Column(name = "image_path")
 //    private String imagePath;
@@ -71,6 +82,14 @@ public class TattooDesign implements Serializable {
 
     // Constructors
     public TattooDesign() {}
+    
+    Boolean isBanned = false;
+String bannedReason;
+LocalDateTime bannedAt;
+
+Boolean isRemovedByArtist = false;
+LocalDateTime removedAt;
+
 
     // Getters and Setters
 
@@ -112,4 +131,54 @@ public class TattooDesign implements Serializable {
     public void setImageDataBase64(String imageDataBase64) {
         this.imageDataBase64 = imageDataBase64;
     }
+
+    public Boolean getIsBanned() {
+        return isBanned;
+    }
+
+    public void setIsBanned(Boolean isBanned) {
+        this.isBanned = isBanned;
+    }
+
+    public String getBannedReason() {
+        return bannedReason;
+    }
+
+    public void setBannedReason(String bannedReason) {
+        this.bannedReason = bannedReason;
+    }
+
+    public LocalDateTime getBannedAt() {
+        return bannedAt;
+    }
+
+    public void setBannedAt(LocalDateTime bannedAt) {
+        this.bannedAt = bannedAt;
+    }
+
+    public Boolean getIsRemovedByArtist() {
+        return isRemovedByArtist;
+    }
+
+    public void setIsRemovedByArtist(Boolean isRemovedByArtist) {
+        this.isRemovedByArtist = isRemovedByArtist;
+    }
+
+    public LocalDateTime getRemovedAt() {
+        return removedAt;
+    }
+
+    public void setRemovedAt(LocalDateTime removedAt) {
+        this.removedAt = removedAt;
+    }
+    
+    public List<DesignComment> getComments() {
+    return comments;
+}
+
+public void setComments(List<DesignComment> comments) {
+    this.comments = comments;
+}
+
+    
 }

@@ -87,7 +87,17 @@ public class AppUser implements Serializable {
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TimeSlot> timeSlots;
 
+    @OneToOne(mappedBy = "artist", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Experience experience;
     // --- getters / setters (keep yours) ---
+
+    public Experience getExperience() {
+        return experience;
+    }
+
+    public void setExperience(Experience experience) {
+        this.experience = experience;
+    }
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
@@ -237,4 +247,32 @@ public class AppUser implements Serializable {
     public void setTimeSlots(List<TimeSlot> timeSlots) {
         this.timeSlots = timeSlots;
     }
+    
+    @JsonbTransient
+@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+private List<DesignFavourite> favourites;
+
+@JsonbTransient
+@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+private List<DesignLike> likes;
+
+public List<DesignFavourite> getFavourites() {
+    return favourites;
+}
+
+public void setFavourites(List<DesignFavourite> favourites) {
+    this.favourites = favourites;
+}
+
+public List<DesignLike> getLikes() {
+    return likes;
+}
+
+public void setLikes(List<DesignLike> likes) {
+    this.likes = likes;
+}
+
+
+
+
 }

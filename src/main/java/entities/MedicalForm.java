@@ -44,6 +44,18 @@ private LocalDateTime approvedAt;
 
     @Column(name = "VALIDATED_AT")
     private LocalDateTime validatedAt;
+    
+     // ADD THIS FIELD FOR REJECTION REASON
+    @Column(name = "REJECTION_REASON", length = 1000)
+    private String rejectionReason;
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT_ID", nullable = false)

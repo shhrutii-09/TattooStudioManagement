@@ -74,56 +74,56 @@ public class ArtistRest {
     // Designs
     // -----------------------
     
-    @POST
-    @Path("/{id}/designs")
-    public Response addDesign(@PathParam("id") Long id, TattooDesign design) {
-        try {
-            // NOTE: The incoming 'design' object from the client payload 
-            // should match the fields in TattooDesign.java (title, style, price, description, etc.).
-            // The JSON body you provided in the prompt is suitable.
-            TattooDesign created = artistEJB.addDesign(id, design);
-            // Return 201 Created for a new resource
-            return Response.status(Response.Status.CREATED).entity(created).build();
-        } catch (IllegalArgumentException ex) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", ex.getMessage()))
-                    .build();
-        } catch (Exception ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("error", ex.getMessage()))
-                    .build();
-        }
-    }
+//    @POST
+//    @Path("/{id}/designs")
+//    public Response addDesign(@PathParam("id") Long id, TattooDesign design) {
+//        try {
+//            // NOTE: The incoming 'design' object from the client payload 
+//            // should match the fields in TattooDesign.java (title, style, price, description, etc.).
+//            // The JSON body you provided in the prompt is suitable.
+////            TattooDesign created = artistEJB.addDesign(id, design);
+//            // Return 201 Created for a new resource
+////            return Response.status(Response.Status.CREATED).entity(created).build();
+//        } catch (IllegalArgumentException ex) {
+//            return Response.status(Response.Status.BAD_REQUEST)
+//                    .entity(Map.of("error", ex.getMessage()))
+//                    .build();
+//        } catch (Exception ex) {
+//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//                    .entity(Map.of("error", ex.getMessage()))
+//                    .build();
+//        }
+//    }
     
-    @PUT
-    @Path("/designs/{designId}")
-    public Response updateDesign(@PathParam("designId") Long designId, TattooDesign designPayload) {
-        try {
-            // The payload can contain any subset of fields (title, price, imagePath, etc.)
-            TattooDesign updated = artistEJB.updateDesign(designId, designPayload);
-            return Response.ok(updated).build();
-        } catch (IllegalArgumentException ex) {
-            String message = ex.getMessage();
-            if (message.contains("not found")) {
-                 return Response.status(Response.Status.NOT_FOUND)
-                        .entity(Map.of("error", message))
-                        .build();
-            }
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", message))
-                    .build();
-        } catch (Exception ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(Map.of("error", ex.getMessage()))
-                    .build();
-        }
-    }
-    
+//    @PUT
+//    @Path("/designs/{designId}")
+//    public Response updateDesign(@PathParam("designId") Long designId, TattooDesign designPayload) {
+//        try {
+//            // The payload can contain any subset of fields (title, price, imagePath, etc.)
+//            TattooDesign updated = artistEJB.updateDesign(designId, designPayload);
+//            return Response.ok(updated).build();
+//        } catch (IllegalArgumentException ex) {
+//            String message = ex.getMessage();
+//            if (message.contains("not found")) {
+//                 return Response.status(Response.Status.NOT_FOUND)
+//                        .entity(Map.of("error", message))
+//                        .build();
+//            }
+//            return Response.status(Response.Status.BAD_REQUEST)
+//                    .entity(Map.of("error", message))
+//                    .build();
+//        } catch (Exception ex) {
+//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+//                    .entity(Map.of("error", ex.getMessage()))
+//                    .build();
+//        }
+//    }
+//    
     @DELETE
 @Path("/designs/{designId}")
 public Response deleteDesign(@PathParam("designId") Long designId) {
     try {
-        artistEJB.deleteDesign(designId);
+//        artistEJB.deleteDesign(designId);
         // Use 204 No Content for a successful deletion operation
         return Response.status(Response.Status.NO_CONTENT).build();
     } catch (IllegalArgumentException ex) {

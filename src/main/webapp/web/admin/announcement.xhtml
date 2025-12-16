@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Admin — Announcements | InkFlow</ui:define>
+    <ui:define name="pageTitle">Announcements Management</ui:define>
+
+    <ui:define name="content">
+        <h:form id="announcementsForm">
+
+            <p:messages id="msgs" showDetail="true" closable="true" />
+
+            <section class="table-section">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <h3>Announcements</h3>
+                        <p class="muted">Create and manage announcements for clients, artists, and all users.</p>
+                    </div>
+
+                    <p:commandButton icon="pi pi-refresh"
+                                     update="announcementsForm:announcementsTable announcementsForm:msgs"
+                                     process="@this"
+                                     action="#{announcementMB.loadAnnouncements()}"/>
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <p:commandButton value="New Announcement" icon="pi pi-plus"
+                                     styleClass="btn-primary"
+                                     action="#{announcementMB.createNew()}"
+                                     process="@this"
+                                     update=":announcementsForm:msgs"
+                                     oncomplete="PF('announcementDialog').show();"/>
+                </div>
+
+                <p:dataTable id="announcementsTable"
+                             value="#{announcementMB.announcements}"
+                             var="ann"
+                             rows="10"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             rowsPerPageTemplate="5,10,20,50"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="Showing {startRecord} to {endRecord} of {totalRecords} announcements"
+                             emptyMessage="No announcements found"
+                             styleClass="ui-datatable">
+
+                    <p:column headerText="ID" width="60" sortBy="#{ann.announcementId}">
+                        #{ann.announcementId}
+                    </p:column>
+
+                    <p:column headerText="Title" sortBy="#{ann.title}">
+                        <strong>#{ann.title}</strong>
+                    </p:column>
+
+                    <p:column headerText="Message" width="300">
+                        <p:outputLabel value="#{ann.message}"
+                                       style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; display: block;"/>
+                    </p:column>
+
+                    <p:column headerText="Target" width="120" sortBy="#{ann.targetRole}">
+                        <p:tag value="#{ann.targetRoleLabel}"
+                               severity="#{ann.targetRole == 'ALL' ? 'info' : ann.targetRole == 'CLIENT' ? 'success' : 'warning'}"/>
+                    </p:column>
+
+                    <p:column headerText="Posted" width="150" sortBy="#{ann.postedAt}">
+                        #{ann.postedDateFormatted}<br/>
+                        <small class="muted">#{ann.postedTimeFormatted}</small>
+                    </p:column>
+
+                    <p:column headerText="Posted By" width="150">
+                        #{ann.postedByName}<br/>
+                        <small class="muted">ID: #{ann.postedById}</small>
+                    </p:column>
+
+                    <p:column headerText="Actions" width="200" style="text-align:center;">
+                        <p:commandButton icon="pi pi-eye" title="View"
+                                         styleClass="btn-primary icon-btn"
+                                         process="@this"
+                                         action="#{announcementMB.prepareView(ann)}"
+                                         update=":announcementsForm:viewDialog :announcementsForm:msgs"
+                                         oncomplete="PF('viewDialog').show();"/>
+
+                        <p:commandButton icon="pi pi-pencil" title="Edit"
+                                         styleClass="btn-warning icon-btn" style="margin-left:6px;"
+                                         process="@this"
+                                         action="#{announcementMB.prepareEdit(ann)}"
+                                         update=":announcementsForm:msgs"
+                                         oncomplete="PF('announcementDialog').show();"/>
+
+                        <p:commandButton icon="pi pi-trash" title="Delete"
+                                         styleClass="btn-danger icon-btn" style="margin-left:6px;"
+                                         process="@this"
+                                         action="#{announcementMB.askDelete(ann)}"
+                                         update=":announcementsForm:deleteConfirmDlg :announcementsForm:msgs"
+                                         oncomplete="PF('deleteConfirmDlg').show();"/>
+                    </p:column>
+                </p:dataTable>
+            </section>
+
+            <!-- Announcement Dialog -->
+           <!-- New/Edit Announcement Dialog -->
+<p:dialog id="announcementDialog"
+          widgetVar="announcementDialog"
+          header="#{announcementMB.creatingNew ? 'Create New Announcement' : 'Edit Announcement'}"
+          modal="true"
+          width="600"
+          resizable="false"
+          appendTo="@(body)">
+    
+    <h:panelGrid id="announcementGrid" columns="2" columnClasses="label-col,value-col" style="width:100%; margin-bottom:15px;">
+        <h:outputLabel for="annTitle" value="Title: *" />
+        <p:inputText id="annTitle" value="#{announcementMB.currentAnnouncement.title}"
+                     required="true" requiredMessage="Title is required" style="width:100%;" />
+
+        <h:outputLabel for="annTarget" value="Target Audience: *" />
+        <p:selectOneMenu id="annTarget" value="#{announcementMB.currentAnnouncement.targetRole}"
+                         required="true" requiredMessage="Target audience is required" style="width:100%;">
+            <f:selectItem itemLabel="All Users" itemValue="ALL" />
+            <f:selectItem itemLabel="Clients Only" itemValue="CLIENT" />
+            <f:selectItem itemLabel="Artists Only" itemValue="ARTIST" />
+        </p:selectOneMenu>
+
+        <h:outputLabel for="annMessage" value="Message: *" />
+        <p:inputTextarea id="annMessage" value="#{announcementMB.currentAnnouncement.message}"
+                         required="true" requiredMessage="Message is required"
+                         rows="6" style="width:100%;" />
+    </h:panelGrid>
+
+    <f:facet name="footer">
+        <div style="text-align:right;">
+            <p:commandButton id="saveBtn"
+                             value="#{announcementMB.creatingNew ? 'Create' : 'Update'}"
+                             icon="#{announcementMB.creatingNew ? 'pi pi-plus' : 'pi-check'}"
+                             styleClass="btn-primary"
+                             action="#{announcementMB.save()}"
+                             process="@form"
+                             update="announcementGrid announcementsForm:announcementsTable announcementsForm:msgs"
+                             oncomplete="if (!args.validationFailed) { PF('announcementDialog').hide(); }"/>
+                             
+            <p:commandButton value="Cancel"
+                             styleClass="btn-secondary" 
+                             onclick="PF('announcementDialog').hide();"
+                             type="button"/>
+        </div>
+    </f:facet>
+</p:dialog>
+
+            <!-- View Dialog -->
+            <p:dialog id="viewDialog"
+                      widgetVar="viewDialog"
+                      header="Announcement Details"
+                      modal="true"
+                      width="600"
+                      resizable="false"
+                      appendTo="@(body)">
+                <h:panelGrid columns="2" columnClasses="label-col,value-col" style="width:100%;">
+                    <h:outputText value="ID:" style="font-weight:bold;"/>
+                    <h:outputText value="#{announcementMB.currentAnnouncement.announcementId}" />
+
+                    <h:outputText value="Title:" style="font-weight:bold;"/>
+                    <h:outputText value="#{announcementMB.currentAnnouncement.title}"
+                                  style="font-size:1.1em; color:#333;"/>
+
+                    <h:outputText value="Target Audience:" style="font-weight:bold;"/>
+                    <h:outputText value="#{announcementMB.currentAnnouncement.targetRoleLabel}" />
+
+                    <h:outputText value="Posted By:" style="font-weight:bold;"/>
+                    <h:outputText value="#{announcementMB.currentAnnouncement.postedByName} (ID: #{announcementMB.currentAnnouncement.postedById})" />
+
+                    <h:outputText value="Posted On:" style="font-weight:bold;"/>
+                    <h:outputText value="#{announcementMB.currentAnnouncement.postedDateFormatted} at #{announcementMB.currentAnnouncement.postedTimeFormatted}" />
+
+                    <h:outputText value="Message:" style="font-weight:bold; vertical-align:top;"/>
+                    <p:panel style="background:#f9f9f9; padding:15px; border:1px solid #ddd; border-radius:4px;">
+                        <h:outputText value="#{announcementMB.currentAnnouncement.message}"
+                                      style="white-space:pre-wrap; line-height:1.5;"/>
+                    </p:panel>
+                </h:panelGrid>
+                <f:facet name="footer">
+                    <div style="text-align:right;">
+                        <p:commandButton value="Close" styleClass="btn-secondary" onclick="PF('viewDialog').hide();"/>
+                    </div>
+                </f:facet>
+            </p:dialog>
+
+            <!-- Delete Confirmation -->
+            <p:confirmDialog id="deleteConfirmDlg" widgetVar="deleteConfirmDlg" header="Confirm delete" message="Are you sure you want to delete this announcement?" severity="alert" appendTo="@(body)">
+                <p:commandButton value="Yes" styleClass="btn-danger" action="#{announcementMB.confirmDelete()}" update="announcementsForm:announcementsTable announcementsForm:msgs" oncomplete="PF('deleteConfirmDlg').hide();" />
+                <p:commandButton value="No" styleClass="btn-secondary" onclick="PF('deleteConfirmDlg').hide();" type="button"/>
+            </p:confirmDialog>
+
+        </h:form>
+
+        <style type="text/css">
+            .table-section {
+                background: white; border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            .muted { color: #6c757d !important; font-size: 0.9em; }
+            .btn-primary { background-color: #007bff; border-color: #007bff; }
+            .btn-secondary { background-color: #6c757d; border-color: #6c757d; }
+            .btn-warning { background-color: #ffc107; border-color: #ffc107; color: #212529; }
+            .btn-danger { background-color: #dc3545; border-color: #dc3545; }
+            .btn-primary:hover, .btn-secondary:hover, .btn-warning:hover, .btn-danger:hover { opacity: 0.9; }
+            .icon-btn { width: 32px !important; height: 32px !important; padding: 6px !important; }
+            .label-col { width: 150px; font-weight: bold; padding: 8px 15px 8px 0; vertical-align: top; }
+            .value-col { padding: 8px 0; }
+            .ui-tag { padding: 2px 8px !important; border-radius: 12px !important; font-size: 0.85em !important; font-weight: 600 !important; }
+            .ui-dialog .ui-dialog-titlebar { background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+            .ui-panel .ui-panel-titlebar { background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; }
+        </style>
+    </ui:define>
+</ui:composition>

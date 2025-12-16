@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Artists Earnings | InkFlow Admin</ui:define>
+
+    <ui:define name="pageTitle">
+        <div class="page-header">
+            <h2><i class="pi pi-wallet"></i> Artists — Earnings / Payouts</h2>
+            <p class="subtitle">Manage pending earnings and payouts</p>
+        </div>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="earningsForm">
+            <p:growl id="growl" showDetail="true" life="5000" />
+
+   <!-- Quick Stats Horizontal Row -->
+<div class="p-grid p-mb-4" style="gap:10px;">
+    <div class="p-col-12 p-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #e3f2fd;">
+                <i class="pi pi-users" style="color: #2196f3;"></i>
+            </div>
+            <div class="stat-content">
+                <h3>#{artistEarningsBean.artistsCount}</h3>
+                <p>Total Artists</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-col-12 p-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fff3e0;">
+                <i class="pi pi-clock" style="color: #ff9800;"></i>
+            </div>
+            <div class="stat-content">
+                <h3>
+                    <h:outputText value="#{artistEarningsBean.totalPendingAllArtists}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                    </h:outputText>
+                </h3>
+                <p>Pending (All Artists)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-col-12 p-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #e8f5e9;">
+                <i class="pi pi-check-circle" style="color: #4caf50;"></i>
+            </div>
+            <div class="stat-content">
+                <h3>
+                    <h:outputText value="#{artistEarningsBean.totalPaidAllArtists}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                    </h:outputText>
+                </h3>
+                <p>Total Paid (All Time)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-col-12 p-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: #fffde7;">
+                <i class="pi pi-list" style="color: #ffc107;"></i>
+            </div>
+            <div class="stat-content">
+                <h3>#{artistEarningsBean.pendingItemsCount}</h3>
+                <p>Pending Items</p>
+            </div>
+        </div>
+    </div>
+</div>
+   
+<!-- Action bar - Kept Horizontal -->
+<div class="action-bar p-p-3 p-mb-3" style="background: #f8f9fa; border-radius: 8px;">
+    <div class="p-grid p-align-center">
+        <div class="p-col-12 p-md-8">
+            <h4 style="margin: 0; color: #2c3e50;">Artist Earnings Summary</h4>
+            <p class="muted" style="margin: 5px 0 0 0;">Pending amounts / actions</p>
+        </div>
+        <div class="p-col-12 p-md-4" style="text-align:right;">
+            <p:commandButton value="Refresh" icon="pi pi-refresh"
+                             action="#{artistEarningsBean.loadAll}"
+                             update=":earningsForm:summaryTable :earningsForm:growl"
+                             styleClass="p-button-outlined" />
+        </div>
+    </div>
+</div>
+            <!-- Summary Table -->
+            <p:card style="border:none; box-shadow:0 2px 4px rgba(0,0,0,0.08);">
+                <p:dataTable id="summaryTable"
+                             value="#{artistEarningsBean.summaries}"
+                             var="s"
+                             paginator="true" rows="10"
+                             emptyMessage="No artists found"
+                             styleClass="clean-table"
+                             rowKey="#{s.artistId}">
+                    <p:column headerText="ARTIST" width="250">
+                        <div style="display:flex; align-items:center;">
+                            <div style="width:48px; height:48px; border-radius:50%; background:#f0f4f8; display:flex; align-items:center; justify-content:center; margin-right:12px;">
+                                <i class="pi pi-user" style="font-size:20px; color:#666;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin:0;">#{s.artistName}</h4>
+                                <p class="muted" style="margin:2px 0 0 0;">ID: #{s.artistId}</p>
+                            </div>
+                        </div>
+                    </p:column>
+
+                    <p:column headerText="TOTAL PAID" style="text-align:right; width:150px;">
+                        <h:outputText value="#{s.totalPaid}">
+                            <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="PENDING TO PAY" style="text-align:right; width:160px;">
+                        <h:outputText value="#{s.pendingAmount}">
+                            <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                        </h:outputText>
+                        <p class="muted" style="margin:4px 0 0 0;">#{s.pendingCount} item(s)</p>
+                    </p:column>
+
+                    <p:column headerText="LAST PAYOUT" style="width:160px;">
+                        <h:outputText value="#{s.lastPayout}" />
+                    </p:column>
+
+                    <p:column headerText="ACTIONS" style="width:220px;">
+                        <div class="action-buttons" style="display:flex; gap:8px;">
+                            <p:commandButton value="View Pending" icon="pi pi-eye"
+                                             actionListener="#{artistEarningsBean.openPendingDialog(s)}"
+                                             update=":earningsForm:pendingDialog :earningsForm:growl"
+                                             oncomplete="PF('pendingDialog').show()" />
+
+                            <p:commandButton value="Monthly Pay Artist" icon="pi pi-credit-card"
+                                             actionListener="#{artistEarningsBean.preparePay(s)}"
+                                             update=":earningsForm:payDialog :earningsForm:growl"
+                                             oncomplete="PF('payDialog').show()"
+                                             styleClass="p-button-success" />
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </p:card>
+
+            <!-- Pending Earnings Dialog -->
+            <p:dialog id="pendingDialog" widgetVar="pendingDialog" header="Pending Earnings"
+                      modal="true" appendTo="@(body)" resizable="false" width="800">
+                <h:panelGroup layout="block" style="padding:10px;">
+                    <h3>Pending for: <strong>#{artistEarningsBean.selectedSummary.artistName}</strong></h3>
+                    <p:dataTable value="#{artistEarningsBean.pendingList}" var="pl" rows="8" paginator="true" emptyMessage="No pending items">
+                        <p:column headerText="Log ID" style="width:80px;">
+                            <h:outputText value="#{pl.logId}" />
+                        </p:column>
+                        <p:column headerText="Total" style="text-align:right;">
+                            <h:outputText value="#{pl.totalAmount}">
+                                <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Artist Share" style="text-align:right;">
+                            <h:outputText value="#{pl.artistShare}">
+                                <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:outputText value="#{pl.payoutStatus}" />
+                        </p:column>
+                        <p:column headerText="Created At">
+                            <h:outputText value="#{pl.calculatedAt}" />
+                        </p:column>
+                    </p:dataTable>
+
+                    <h3 style="margin-top:16px;">Payout History</h3>
+                    <p:dataTable value="#{artistEarningsBean.payoutHistory}" var="ph" rows="6" emptyMessage="No payouts">
+                        <p:column headerText="Payout ID">
+                            <h:outputText value="#{ph.payoutId}" />
+                        </p:column>
+                        <p:column headerText="Amount" style="text-align:right;">
+                            <h:outputText value="#{ph.amount}">
+                                <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <h:outputText value="#{ph.payoutStatus}" />
+                        </p:column>
+                        <p:column headerText="Notes">
+                            <h:outputText value="#{ph.notes}" />
+                        </p:column>
+                        <p:column headerText="Date">
+                            <h:outputText value="#{ph.payoutDate}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+                <f:facet name="footer">
+                    <p:commandButton value="Close" onclick="PF('pendingDialog').hide()" styleClass="p-button-secondary" />
+                </f:facet>
+            </p:dialog>
+
+            <!-- Pay Artist Dialog -->
+            <p:dialog id="payDialog" widgetVar="payDialog" header="Pay Artist" modal="true" appendTo="@(body)" resizable="false" width="520">
+                <h:panelGrid columns="2" cellpadding="8" style="width:100%;">
+                    <h:outputLabel value="Artist" />
+                    <h:outputText value="#{artistEarningsBean.selectedSummary.artistName}" />
+
+                    <h:outputLabel value="Amount (Pending)" />
+                    <h:outputText value="#{artistEarningsBean.selectedSummary.pendingAmount}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" />
+                    </h:outputText>
+
+                    <h:outputLabel for="notes" value="Notes (optional)" />
+                    <p:inputTextarea id="notes" value="#{artistEarningsBean.payoutNotes}" rows="4" cols="40" />
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Pay Now" actionListener="#{artistEarningsBean.paySelectedArtist}"
+                                     update=":earningsForm:summaryTable :earningsForm:pendingDialog :earningsForm:growl"
+                                     oncomplete="PF('payDialog').hide()" styleClass="p-button-success" />
+                    <p:commandButton value="Cancel" onclick="PF('payDialog').hide()" styleClass="p-button-secondary" />
+                </f:facet>
+            </p:dialog>
+
+            <style>
+                .stat-card { text-align:center; padding:15px; margin:5px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.08); }
+                .clean-table .ui-datatable-thead th { background: #f8f9fa; border-bottom:2px solid #dee2e6; }
+                .muted { color:#6c757d; font-size:12px; }
+                
+                .stat-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+}
+
+.stat-icon i {
+    font-size: 24px;
+}
+
+.stat-content h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.stat-content p {
+    margin: 5px 0 0 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+            </style>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,10 +1,14 @@
 package rest;
 
+import dto.AppointmentDTO;
+import dto.AppointmentFilterDTO;
+import dto.MedicalFormDTO;
+import dto.MedicalFormFilterDTO;
+import dto.TimeSlotDTO;
+import dto.TimeSlotFilterDTO;
 import ejb.AdminEJBLocal;
 import entities.*;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import java.math.BigDecimal;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import jakarta.annotation.security.RolesAllowed; // <-- Ensure this is imported!
 import jakarta.ws.rs.core.SecurityContext;
+import java.util.HashMap;
 
 @Path("/admin")
 //@RolesAllowed({"ADMIN"})
@@ -253,22 +258,22 @@ public Response deleteDesign(@PathParam("id") Long designId) {
         }
     }
 
-    @POST
-    @Path("/appointments/{id}/status")
-    public Response changeAppointmentStatus(@PathParam("id") Long id, Map<String, Object> data) {
-        String status = data.get("status").toString();
-        String reason = data.getOrDefault("reason", "").toString();
-        try {
-            adminEJB.changeAppointmentStatus(id, status, reason);
-            return Response.ok(Map.of("success", true, "message", "Appointment status changed.")).build();
-        } catch (Exception ex) {
-            // Catching generic Exception for wrapped IllegalArgumentException (Not Found)
-            String message = getBusinessMessage(ex);
-            return Response.status(Response.Status.NOT_FOUND)
-                           .entity(Map.of("message", message))
-                           .build();
-        }
-    }
+//    @POST
+//    @Path("/appointments/{id}/status")
+//    public Response changeAppointmentStatus(@PathParam("id") Long id, Map<String, Object> data) {
+//        String status = data.get("status").toString();
+//        String reason = data.getOrDefault("reason", "").toString();
+//        try {
+//            adminEJB.changeAppointmentStatus(id, status, reason);
+//            return Response.ok(Map.of("success", true, "message", "Appointment status changed.")).build();
+//        } catch (Exception ex) {
+//            // Catching generic Exception for wrapped IllegalArgumentException (Not Found)
+//            String message = getBusinessMessage(ex);
+//            return Response.status(Response.Status.NOT_FOUND)
+//                           .entity(Map.of("message", message))
+//                           .build();
+//        }
+//    }
 
     @POST
     @Path("/appointments/{id}/assign-slot")
@@ -491,4 +496,307 @@ public Response generateReports(@QueryParam("from") String fromDateStr, @QueryPa
                            .build();
         }
     }
+    
+    // Add these endpoints to AdminRest.java
+
+// -----------------------
+// Appointment Management with Filters
+// -----------------------
+@POST
+@Path("/appointments/filter")
+public Response filterAppointments(AppointmentFilterDTO filter) {
+    try {
+        List<AppointmentDTO> appointments = adminEJB.getFilteredAppointments(filter);
+        Long total = adminEJB.countFilteredAppointments(filter);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("appointments", appointments);
+        response.put("total", total);
+        response.put("page", filter.getPage());
+        response.put("size", filter.getSize());
+        
+        return Response.ok(response).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error filtering appointments: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@PUT
+@Path("/appointments/{id}/update-status")
+public Response updateAppointmentStatus(@PathParam("id") Long appointmentId, 
+                                        Map<String, Object> data) {
+    try {
+        String status = (String) data.get("status");
+        String cancellationReason = (String) data.get("cancellationReason");
+        Long adminId = Long.parseLong(data.get("adminId").toString());
+        
+        if (status == null || status.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(Map.of("message", "Status is required"))
+                           .build();
+        }
+        
+        boolean success = adminEJB.updateAppointmentStatus(appointmentId, status, cancellationReason, adminId);
+        
+        if (success) {
+            return Response.ok(Map.of("success", true, "message", "Appointment status updated successfully"))
+                           .build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(Map.of("message", "Failed to update appointment status"))
+                           .build();
+        }
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error updating appointment status: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+// Get appointment statistics
+@GET
+@Path("/appointments/statistics")
+public Response getAppointmentStatistics(@QueryParam("startDate") String startDateStr,
+                                         @QueryParam("endDate") String endDateStr) {
+    try {
+        LocalDate startDate = startDateStr != null ? LocalDate.parse(startDateStr) : LocalDate.now().minusMonths(1);
+        LocalDate endDate = endDateStr != null ? LocalDate.parse(endDateStr) : LocalDate.now();
+        
+        // Get appointment counts by status
+        Map<String, Long> stats = new HashMap<>();
+        String[] statuses = {"PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "PAID"};
+        
+        for (String status : statuses) {
+            AppointmentFilterDTO filter = new AppointmentFilterDTO();
+            filter.setStatus(status);
+            filter.setStartDate(startDate);
+            filter.setEndDate(endDate);
+            filter.setSize(Integer.MAX_VALUE); // Get all
+            stats.put(status, adminEJB.countFilteredAppointments(filter));
+        }
+        
+        return Response.ok(stats).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error getting statistics: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+// Add these endpoints to your existing AdminRest.java:
+
+// -----------------------
+// Time Slot Management with DTOs
+// -----------------------
+@POST
+@Path("/time-slots/filter")
+public Response filterTimeSlots(TimeSlotFilterDTO filter) {
+    try {
+        List<TimeSlotDTO> timeSlots = adminEJB.getFilteredTimeSlots(filter);
+        Long total = adminEJB.countFilteredTimeSlots(filter);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("timeSlots", timeSlots);
+        response.put("total", total);
+        response.put("page", filter.getPage());
+        response.put("size", filter.getSize());
+        
+        return Response.ok(response).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error filtering time slots: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@PUT
+@Path("/slots/{id}/block-with-notify")
+public Response blockTimeSlotWithNotification(@PathParam("id") Integer slotId, 
+                                              Map<String, Object> data) {
+    try {
+        Long adminId = Long.parseLong(data.get("adminId").toString());
+        String reason = data.get("reason").toString();
+        
+        boolean success = adminEJB.blockTimeSlotWithNotification(slotId, adminId, reason);
+        
+        if (success) {
+            return Response.ok(Map.of("success", true, "message", "Time slot blocked and artist notified")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(Map.of("message", "Failed to block time slot"))
+                           .build();
+        }
+    } catch (Exception e) {
+        String message = getBusinessMessage(e);
+        return Response.status(Response.Status.BAD_REQUEST)
+                       .entity(Map.of("message", "Error blocking time slot: " + message))
+                       .build();
+    }
+}
+
+@PUT
+@Path("/slots/{id}/unblock-with-notify")
+public Response unblockTimeSlotWithNotification(@PathParam("id") Integer slotId, 
+                                                Map<String, Object> data) {
+    try {
+        Long adminId = Long.parseLong(data.get("adminId").toString());
+        
+        boolean success = adminEJB.unblockTimeSlotWithNotification(slotId, adminId);
+        
+        if (success) {
+            return Response.ok(Map.of("success", true, "message", "Time slot unblocked and artist notified")).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(Map.of("message", "Failed to unblock time slot"))
+                           .build();
+        }
+    } catch (Exception e) {
+        String message = getBusinessMessage(e);
+        return Response.status(Response.Status.BAD_REQUEST)
+                       .entity(Map.of("message", "Error unblocking time slot: " + message))
+                       .build();
+    }
+}
+
+@GET
+@Path("/artists/{artistId}/blocked-slots")
+public Response getBlockedSlotsForArtist(@PathParam("artistId") Long artistId) {
+    try {
+        List<TimeSlot> blockedSlots = adminEJB.getBlockedSlotsForArtist(artistId);
+        return Response.ok(blockedSlots).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error fetching blocked slots: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@GET
+@Path("/artists/{artistId}/booked-slots")
+public Response getBookedSlotsForArtist(@PathParam("artistId") Long artistId) {
+    try {
+        List<TimeSlot> bookedSlots = adminEJB.getBookedSlotsForArtist(artistId);
+        return Response.ok(bookedSlots).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error fetching booked slots: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+// In AdminRest.java - Medical Forms Management endpoints:
+
+@POST
+@Path("/medical-forms/filter")
+public Response filterMedicalForms(MedicalFormFilterDTO filter) {
+    try {
+        List<MedicalFormDTO> forms = adminEJB.getFilteredMedicalForms(filter);
+        Long total = adminEJB.countFilteredMedicalForms(filter);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("medicalForms", forms);
+        response.put("total", total);
+        response.put("page", filter.getPage());
+        response.put("size", filter.getSize());
+        
+        return Response.ok(response).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error filtering medical forms: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@PUT
+@Path("/medical-forms/{id}/reject")
+public Response rejectMedicalForm(@PathParam("id") Integer formId,
+                                  Map<String, Object> data) {
+    try {
+        Long adminId = Long.parseLong(data.get("adminId").toString());
+        String reason = data.get("reason") != null ? data.get("reason").toString() : "Medical form rejected";
+        
+        boolean success = adminEJB.rejectMedicalForm(formId, adminId, reason);
+        
+        if (success) {
+            return Response.ok(Map.of(
+                "success", true,
+                "message", "Medical form rejected successfully. Client has been notified."
+            )).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity(Map.of("message", "Failed to reject medical form"))
+                           .build();
+        }
+    } catch (Exception e) {
+        String message = getBusinessMessage(e);
+        return Response.status(Response.Status.BAD_REQUEST)
+                       .entity(Map.of("message", "Error rejecting medical form: " + message))
+                       .build();
+    }
+}
+
+@GET
+@Path("/medical-forms/{id}")
+public Response getMedicalFormDetails(@PathParam("id") Integer formId) {
+    try {
+        MedicalFormDTO form = adminEJB.getMedicalFormDetails(formId);
+        if (form == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity(Map.of("message", "Medical form not found"))
+                           .build();
+        }
+        return Response.ok(form).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error fetching medical form details: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@GET
+@Path("/appointments/pending-forms")
+public Response getAppointmentsWithPendingForms() {
+    try {
+        List<Appointment> appointments = adminEJB.getAppointmentsWithPendingForms();
+        return Response.ok(appointments).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error fetching appointments with pending forms: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@GET
+@Path("/appointments/approved-forms")
+public Response getAppointmentsWithApprovedForms() {
+    try {
+        List<Appointment> appointments = adminEJB.getAppointmentsWithApprovedForms();
+        return Response.ok(appointments).build();
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error fetching appointments with approved forms: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
+@GET
+@Path("/medical-forms/statistics")
+public Response getMedicalFormsStatistics(@QueryParam("startDate") String startDateStr,
+                                          @QueryParam("endDate") String endDateStr) {
+    try {
+        LocalDate startDate = startDateStr != null ? LocalDate.parse(startDateStr) : LocalDate.now().minusMonths(1);
+        LocalDate endDate = endDateStr != null ? LocalDate.parse(endDateStr) : LocalDate.now();
+        
+        Map<String, Object> stats = adminEJB.getMedicalFormsStatistics(startDate, endDate);
+        return Response.ok(stats).build();
+        
+    } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                       .entity(Map.of("message", "Error getting medical forms statistics: " + getBusinessMessage(e)))
+                       .build();
+    }
+}
+
 }

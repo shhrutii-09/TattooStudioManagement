@@ -1,0 +1,176 @@
+/* ---------- GLOBAL ---------- */
+:root {
+    --client-primary-color: #2d3436;
+    --client-accent-color: #c0392b;
+    --client-soft-bg: #f8f7f4;
+    --client-text-color: #555;
+}
+
+body.client-body {
+    margin: 0;
+    padding: 0;
+    background: var(--client-soft-bg);
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ---------- NAVBAR ---------- */
+.header-client {
+    background: white;
+    border-bottom: 1px solid #eee;
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.nav-client-content {
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.client-logo {
+    font-size: 1.8em;
+    font-weight: 600;
+    color: var(--client-primary-color);
+    text-decoration: none;
+}
+
+.client-nav-links a,
+.logout-link {
+    margin-left: 25px;
+    font-size: 1em;
+    color: var(--client-primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.client-nav-links a:hover {
+    color: var(--client-accent-color);
+}
+
+.btn-login {
+    padding: 6px 14px;
+    background: var(--client-accent-color);
+    color: white !important;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.btn-login:hover {
+    opacity: 0.9;
+}
+
+/* ---------- PAGE LAYOUT ---------- */
+.page-container {
+    padding: 40px 6%;
+    min-height: 75vh;
+}
+
+/* ---------- FOOTER ---------- */
+.client-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    background: white;
+    color: #777;
+    font-size: 0.9em;
+    border-top: 1px solid #eee;
+}
+/* Dashboard cards */
+.dash-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    text-align: center;
+}
+.dash-card h3 { margin: 0; color: #555; font-weight: 500; }
+.dash-number {
+    font-size: 2em;
+    color: #2d3436;
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+}
+
+/* Recent appointments */
+.recent-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.06);
+}
+
+/* Buttons */
+.cta-main-btn {
+    padding: 12px 28px;
+    background: #c0392b;
+    color: white !important;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cta-light-btn {
+    padding: 10px 20px;
+    background: #f8f7f4;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #2d3436;
+    font-weight: 500;
+}
+
+.small-accent-link {
+    color: #c0392b;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+/* Grids */
+.design-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.design-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+}
+
+.design-image {
+    width: 100%;
+    height: 220px;
+    background: #e5e4e0;
+}
+
+.artist-grid,
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.artist-card,
+.why-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+    font-weight: 500;
+}
+
+.section-title {
+    font-size: 2em;
+    color: #2d3436;
+    margin-bottom: 20px;
+}

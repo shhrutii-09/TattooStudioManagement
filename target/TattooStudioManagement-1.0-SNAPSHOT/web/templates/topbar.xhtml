@@ -6,24 +6,45 @@
     <header class="topbar">
         <div class="topbar-left">
             <button class="menu-toggle" type="button"
-        onclick="document.body.classList.toggle('collapsed')">
-    <i class="pi pi-bars"></i>
-</button>
+                    onclick="document.body.classList.toggle('collapsed')">
+                <i class="pi pi-bars"></i>
+            </button>
             <div class="page-title"><ui:insert name="pageTitle">Admin</ui:insert></div>
         </div>
 
         <div class="topbar-right">
-            <div class="admin-info">
-                <span class="admin-name">#{userSessionBean.loggedIn ? userSessionBean.username : 'Admin'}</span>
-                <!--<i class="pi pi-user"></i>-->
-               <h:link outcome="/web/admin/profile.xhtml" styleClass="nav-icon" title="Manage Profile">
-    <i class="pi pi-user" style="color: #c7a45b;"></i> <!-- gold shade -->
-</h:link>
+            <!-- User Info with Role Badge -->
+            <div class="admin-info" style="display: flex; align-items: center; gap: 10px;">
+                <ui:fragment rendered="#{userSessionBean.loggedIn}">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span class="admin-name">#{userSessionBean.username}</span>
+                        <span style="font-size: 0.8rem; color: #c7a45b; background: rgba(199, 164, 91, 0.1); padding: 2px 8px; border-radius: 10px;">
+                            #{userSessionBean.role}
+                        </span>
+                    </div>
+                    <h:link outcome="/web/admin/profile.xhtml" styleClass="nav-icon" title="Manage Profile">
+                        <i class="pi pi-user" style="color: #c7a45b; font-size: 1.2rem;"></i>
+                    </h:link>
+                </ui:fragment>
+                
+                <ui:fragment rendered="#{not userSessionBean.loggedIn}">
+                    <span style="color: #95a5a6;">Not logged in</span>
+                    <h:link outcome="/web/login.xhtml" style="color: #3498db; margin-left: 10px;">
+                        <i class="pi pi-sign-in"></i> Login
+                    </h:link>
+                </ui:fragment>
             </div>
 
-            <h:form id="logoutForm" prependId="false">
-                <p:commandButton value="Logout" action="#{loginBean.logout}" styleClass="btn-logout" icon="pi pi-sign-out" />
-            </h:form>
+            <!-- Logout Form (only show when logged in) -->
+            <ui:fragment rendered="#{userSessionBean.loggedIn}">
+                <h:form id="logoutForm" prependId="false">
+                    <p:commandButton value="Logout" 
+                                     action="#{loginBean.logout}" 
+                                     styleClass="btn-logout" 
+                                     icon="pi pi-sign-out"
+                                     ajax="false" />
+                </h:form>
+            </ui:fragment>
         </div>
     </header>
 </ui:composition>

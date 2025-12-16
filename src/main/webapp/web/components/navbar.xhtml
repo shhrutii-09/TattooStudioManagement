@@ -1,0 +1,42 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <header class="header-client">
+        <div class="nav-client-content">
+            <!-- Logo -->
+            <h:link outcome="/web/client/home.xhtml" styleClass="client-logo">
+                InkFlow Studio
+            </h:link>
+
+            <!-- Navigation Links -->
+            <nav class="client-nav-links">
+                <h:link value="Home" outcome="/web/client/home.xhtml"/>
+                <h:link value="Designs" outcome="/web/client/browseDesigns.xhtml"/>
+                <h:link value="Artists" outcome="/web/client/artists.xhtml"/>
+                <h:link value="Appointments" outcome="/web/client/my-appointments.xhtml"/>
+                <h:link value="Favourites" outcome="/web/client/favourites.xhtml"/>
+
+                <!-- Logged-in links -->
+                <h:panelGroup rendered="#{userSessionBean.loggedIn}">
+                    <h:link value="Dashboard" outcome="/web/client/home.xhtml"/>
+                    <!--<h:link value="Profile" outcome="/web/client/profile.xhtml"/>-->
+                    <div class="user-menu" style="display: flex; align-items: center; gap: 1rem;">
+                        <span>Welcome, #{userSessionBean.username}</span>
+                        <h:form styleClass="inline-form">
+                            <h:commandLink action="#{loginBean.logout}" value="Logout" styleClass="btn btn-secondary"/>
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+                <!-- Not logged in -->
+                <h:panelGroup rendered="#{not userSessionBean.loggedIn}">
+                    <h:link value="Login" outcome="/web/login.xhtml" styleClass="btn btn-secondary"/>
+                    <h:link value="Register" outcome="/web/register.xhtml" styleClass="btn btn-primary"/>
+                </h:panelGroup>
+            </nav>
+        </div>
+    </header>
+
+</ui:composition>

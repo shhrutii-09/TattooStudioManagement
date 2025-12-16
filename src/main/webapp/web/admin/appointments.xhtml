@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml">
+
+    <ui:define name="title">Admin — Appointments Management | InkFlow</ui:define>
+    <ui:define name="pageTitle">Appointments Management</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="appointmentForm">
+            <p:growl id="growl" showDetail="true" life="5000" />
+
+            <!-- Statistics Dashboard -->
+            <div class="ui-g" style="margin-bottom: 20px;">
+                <div class="ui-g-12 ui-md-3">
+                    <p:panel header="Total" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #2196F3;">#{adminAppointmentBean.totalItems}</h3>
+                        <p>All Appointments</p>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-2">
+                    <p:panel header="Pending" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #FF9800;">#{adminAppointmentBean.appointmentStats['PENDING']}</h3>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-2">
+                    <p:panel header="Confirmed" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #03A9F4;">#{adminAppointmentBean.appointmentStats['CONFIRMED']}</h3>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-2">
+                    <p:panel header="Completed" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #4CAF50;">#{adminAppointmentBean.appointmentStats['COMPLETED']}</h3>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-2">
+                    <p:panel header="Cancelled" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #F44336;">#{adminAppointmentBean.appointmentStats['CANCELLED']}</h3>
+                    </p:panel>
+                </div>
+                <div class="ui-g-12 ui-md-2">
+                    <p:panel header="Paid" styleClass="stat-card">
+                        <h3 style="margin: 0; color: #9C27B0;">#{adminAppointmentBean.appointmentStats['PAID']}</h3>
+                    </p:panel>
+                </div>
+            </div>
+
+            <!-- Filter Panel -->
+            <p:panel header="Filters" toggleable="true" collapsed="false" style="margin-bottom: 20px;">
+                <div class="ui-g">
+                    <div class="ui-g-12 ui-md-3">
+                        <p:outputLabel for="clientName" value="Client Name:" />
+                        <p:inputText id="clientName" value="#{adminAppointmentBean.filter.clientName}" 
+                                   placeholder="Search by client..." style="width:100%" />
+                    </div>
+                    <div class="ui-g-12 ui-md-3">
+                        <p:outputLabel for="artistName" value="Artist Name:" />
+                        <p:inputText id="artistName" value="#{adminAppointmentBean.filter.artistName}" 
+                                   placeholder="Search by artist..." style="width:100%" />
+                    </div>
+                    <div class="ui-g-12 ui-md-2">
+                        <p:outputLabel for="status" value="Status:" />
+                        <p:selectOneMenu id="status" value="#{adminAppointmentBean.filter.status}" style="width:100%">
+                            <f:selectItem itemLabel="All Status" itemValue="ALL" />
+                            <f:selectItem itemLabel="Pending" itemValue="PENDING" />
+                            <f:selectItem itemLabel="Confirmed" itemValue="CONFIRMED" />
+                            <f:selectItem itemLabel="Paid" itemValue="PAID" />
+                            <f:selectItem itemLabel="Completed" itemValue="COMPLETED" />
+                            <f:selectItem itemLabel="Cancelled" itemValue="CANCELLED" />
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-12 ui-md-2">
+                        <p:outputLabel for="startDate" value="From Date:" />
+                        <p:calendar id="startDate" value="#{adminAppointmentBean.filter.startDate}" 
+                                  pattern="yyyy-MM-dd" navigator="true" style="width:100%" />
+                    </div>
+                    <div class="ui-g-12 ui-md-2">
+                        <p:outputLabel for="endDate" value="To Date:" />
+                        <p:calendar id="endDate" value="#{adminAppointmentBean.filter.endDate}" 
+                                  pattern="yyyy-MM-dd" navigator="true" style="width:100%" />
+                    </div>
+                </div>
+                
+                <div class="ui-g" style="margin-top: 15px;">
+                    <div class="ui-g-12">
+                        <p:commandButton value="Search" action="#{adminAppointmentBean.search}" 
+                                       update="@form"
+                                       styleClass="ui-button-primary" />
+                        <p:commandButton value="Clear Filters" action="#{adminAppointmentBean.clearFilters}" 
+                                       update="@form" styleClass="ui-button-secondary" />
+                        <p:commandButton value="Refresh Data" action="#{adminAppointmentBean.loadAppointments}" 
+                                       update="@form" icon="pi pi-refresh" />
+                        
+                    </div>
+                    
+                </div>
+            </p:panel>
+
+            <!-- Appointments Table -->
+            <p:panel id="appointmentsPanel" header="Appointments List">
+                <p:dataTable id="appointmentsTable" 
+                           value="#{adminAppointmentBean.appointments}" 
+                           var="appt"
+                           paginator="true"
+                           rows="10"
+                           rowsPerPageTemplate="5,10,20,50"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           currentPageReportTemplate="Showing {startRecord} to {endRecord} of {totalRecords}"
+                           emptyMessage="No appointments found">
+                    
+                    <p:column headerText="ID" width="80" style="text-align:center">
+                        <h:outputText value="#{appt.appointmentId}" />
+                    </p:column>
+                    
+                    <p:column headerText="Client" width="180">
+                        <h:outputText value="#{appt.clientName}" />
+                        <br />
+                        <small style="color: #666;">#{appt.clientEmail}</small>
+                    </p:column>
+                    
+                    <p:column headerText="Artist" width="150">
+                        <h:outputText value="#{appt.artistName}" />
+                    </p:column>
+                    
+                    <p:column headerText="Date &amp; Time" width="200">
+                        <h:outputText value="#{appt.formattedDateTime}" />
+                        <br />
+                        <p:badge value="#{appt.hasSlot() ? 'Slot: ' += appt.slotId : 'No Slot'}" 
+                               severity="#{appt.hasSlot() ? 'success' : 'warn'}" style="font-size:10px;" />
+                    </p:column>
+                    
+                    <p:column headerText="Status" width="120">
+                        <p:badge value="#{appt.status}" severity="#{adminAppointmentBean.getStatusColor(appt.status)}" />
+                    </p:column>
+                    
+                    <p:column headerText="Design" width="150">
+                        <h:outputText value="#{empty appt.designTitle ? 'No Design' : appt.designTitle}" />
+                    </p:column>
+                    
+                    <p:column headerText="Amount" width="100">
+                        <h:outputText value="#{empty appt.amount ? 'N/A' : '₹' += appt.amountAsDouble}">
+                            <f:convertNumber type="currency" currencySymbol="" minFractionDigits="2" maxFractionDigits="2" />
+                        </h:outputText>
+                    </p:column>
+                    
+                    <p:column headerText="Actions" width="350">
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                            <!-- View Details -->
+                            <p:commandButton icon="pi pi-eye" title="View Details" 
+                                           action="#{adminAppointmentBean.showAppointmentDetails(appt)}"
+                                           oncomplete="PF('detailDialog').show()"
+                                           styleClass="ui-button-info ui-button-sm" />
+                            
+                            <!-- Assign Slot (only for PENDING appointments without slot) -->
+                            <p:commandButton icon="pi pi-calendar-plus" title="Assign Time Slot" 
+                                           action="#{adminAppointmentBean.showAssignSlotDialog(appt)}"
+                                           oncomplete="PF('slotAssignmentDialog').show()"
+                                           rendered="#{appt.pending and not appt.hasSlot()}"
+                                           styleClass="ui-button-success ui-button-sm" />
+                            
+                            <!-- Confirm (only for PENDING) -->
+                            <p:commandButton icon="pi pi-check" title="Confirm" 
+                                           action="#{adminAppointmentBean.confirmAppointment(appt)}"
+                                           update="@form"
+                                           rendered="#{appt.pending}"
+                                           styleClass="ui-button-success ui-button-sm" />
+                            
+                            <!-- Mark as Paid (only for CONFIRMED) -->
+                            <p:commandButton icon="pi pi-dollar" title="Mark as Paid" 
+                                           action="#{adminAppointmentBean.markAsPaid(appt)}"
+                                           update="@form"
+                                           rendered="#{appt.confirmed}"
+                                           styleClass="ui-button-help ui-button-sm" />
+                            
+                            <!-- Complete (only for CONFIRMED or PAID) -->
+                            <p:commandButton icon="pi pi-check-circle" title="Complete" 
+                                           action="#{adminAppointmentBean.completeAppointment(appt)}"
+                                           update="@form"
+                                           rendered="#{appt.confirmed or appt.paid}"
+                                           styleClass="ui-button-primary ui-button-sm" />
+                            
+                            <!-- Cancel (only for PENDING or CONFIRMED) -->
+                            <p:commandButton icon="pi pi-times" title="Cancel" 
+                                           action="#{adminAppointmentBean.showCancelAppointmentDialog(appt)}"
+                                           oncomplete="PF('cancellationDialog').show()"
+                                           rendered="#{appt.pending or appt.confirmed}"
+                                           styleClass="ui-button-danger ui-button-sm" />
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <!-- Appointment Details Dialog - SEPARATE FORM -->
+        <p:dialog header="Appointment Details" widgetVar="detailDialog" 
+                 modal="true" height="550" width="800" resizable="true">
+            <h:form id="detailForm">
+                <p:panelGrid columns="2" layout="grid" style="width:100%" columnClasses="label,value">
+                    <p:outputLabel value="Appointment ID:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{adminAppointmentBean.selectedAppointment.appointmentId}" />
+                    
+                    <p:outputLabel value="Client:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{adminAppointmentBean.selectedAppointment.clientName} (#{adminAppointmentBean.selectedAppointment.clientEmail})" />
+                    
+                    <p:outputLabel value="Artist:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{adminAppointmentBean.selectedAppointment.artistName}" />
+                    
+                    <p:outputLabel value="Date &amp; Time:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{adminAppointmentBean.selectedAppointment.formattedDateTime}" />
+                    
+                    <p:outputLabel value="Status:" style="font-weight:bold;" />
+                    <p:badge value="#{adminAppointmentBean.selectedAppointment.status}" 
+                           severity="#{adminAppointmentBean.getStatusColor(adminAppointmentBean.selectedAppointment.status)}" />
+                    
+                    <p:outputLabel value="Design:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{empty adminAppointmentBean.selectedAppointment.designTitle ? 'No Design Selected' : adminAppointmentBean.selectedAppointment.designTitle}" />
+                    
+                    <p:outputLabel value="Slot ID:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{empty adminAppointmentBean.selectedAppointment.slotId ? 'Not Assigned' : adminAppointmentBean.selectedAppointment.slotId}" />
+                    
+                    <p:outputLabel value="Amount:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{empty adminAppointmentBean.selectedAppointment.amount ? 'Not Set' : '₹' += adminAppointmentBean.selectedAppointment.amountAsDouble}">
+                        <f:convertNumber type="currency" currencySymbol="" minFractionDigits="2" maxFractionDigits="2" />
+                    </p:outputLabel>
+                    
+                    <p:outputLabel value="Payment Status:" style="font-weight:bold;" />
+                    <p:outputLabel value="#{empty adminAppointmentBean.selectedAppointment.paymentStatus ? 'N/A' : adminAppointmentBean.selectedAppointment.paymentStatus}" />
+                    
+                    <p:outputLabel value="Client Notes:" style="font-weight:bold;vertical-align:top;" />
+                    <p:outputLabel value="#{empty adminAppointmentBean.selectedAppointment.clientNote ? 'No notes' : adminAppointmentBean.selectedAppointment.clientNote}" 
+                                 style="white-space: pre-wrap; max-width: 300px;" />
+                    
+                    <p:outputLabel value="Cancellation Reason:" style="font-weight:bold;vertical-align:top;" 
+                                 rendered="#{adminAppointmentBean.selectedAppointment.cancelled}" />
+                    <p:outputLabel value="#{adminAppointmentBean.selectedAppointment.cancellationReason}" 
+                                 rendered="#{adminAppointmentBean.selectedAppointment.cancelled}"
+                                 style="white-space: pre-wrap; max-width: 300px; color: #d32f2f;" />
+                </p:panelGrid>
+                
+                <div style="margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                    <p:commandButton value="Close" onclick="PF('detailDialog').hide()" 
+                                   styleClass="ui-button-secondary" />
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- Cancellation Dialog - SEPARATE FORM -->
+        <p:dialog header="Cancel Appointment" widgetVar="cancellationDialog" 
+                 modal="true" height="350" width="600" resizable="false">
+            <h:form id="cancelForm">
+                <p:panelGrid columns="1" style="width:100%; margin-bottom: 20px;">
+                    <p:outputLabel value="Appointment ID: #{adminAppointmentBean.selectedAppointment.appointmentId}" style="font-weight:bold;" />
+                    <p:outputLabel value="Client: #{adminAppointmentBean.selectedAppointment.clientName}" />
+                    <p:outputLabel value="Artist: #{adminAppointmentBean.selectedAppointment.artistName}" />
+                    <p:outputLabel value="Date: #{adminAppointmentBean.selectedAppointment.formattedDate}" />
+                </p:panelGrid>
+                
+                <p:outputLabel for="cancelReason" value="Cancellation Reason (Required):" style="font-weight:bold;" />
+                <p:inputTextarea id="cancelReason" value="#{adminAppointmentBean.cancellationReason}" 
+                               rows="4" style="width:100%" required="true" 
+                               placeholder="Enter reason for cancellation..." />
+                
+                <div style="margin-top: 20px; text-align: right;">
+                    <p:commandButton value="Cancel Appointment" action="#{adminAppointmentBean.updateAppointmentStatus}"
+                                   update=":appointmentForm"
+                                   oncomplete="if(!args.validationFailed) PF('cancellationDialog').hide()"
+                                   styleClass="ui-button-danger" />
+                    <p:commandButton value="Close" onclick="PF('cancellationDialog').hide()" 
+                                   styleClass="ui-button-secondary" />
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!-- Slot Assignment Dialog - SEPARATE FORM -->
+        <p:dialog id="slotAssignmentDialog"
+          widgetVar="slotAssignmentDialog"
+          header="Assign Time Slot"
+          modal="true"
+          responsive="true"
+          width="450"
+          styleClass="dialog-clean">
+
+    <h:form id="slotAssignmentForm">
+
+        <div class="p-fluid">
+
+            <!-- SELECT DATE -->
+            <div class="field mb-3">
+                <p:outputLabel for="selectedDate" value="Select Date" />
+                <p:calendar id="selectedDate"
+                            value="#{artistAppointmentBean.selectedDate}"
+                            pattern="dd/MM/yyyy"
+                            mindate="today"
+                            required="true">
+
+                    <p:ajax event="dateSelect"
+                            listener="#{artistAppointmentBean.loadAvailableSlots}"
+                            update="slotsList" />
+                </p:calendar>
+            </div>
+
+            <!-- AVAILABLE SLOTS -->
+            <p:outputPanel id="slotsList">
+
+                <p:outputLabel value="Available Slots"
+                               styleClass="font-weight-bold d-block mb-2" />
+
+                <p:dataList value="#{artistAppointmentBean.availableSlots}"
+                            var="slot"
+                            type="unordered"
+                            itemStyleClass="mb-2"
+                            rendered="#{not empty artistAppointmentBean.availableSlots}">
+
+                    <p:commandButton
+                            value="#{slot.startTimeFormatted} - #{slot.endTimeFormatted}"
+                            action="#{artistAppointmentBean.assignSlot(slot.slotId)}"
+                            update=":mainForm:appointmentsTable :mainForm:msg"
+                            oncomplete="PF('slotAssignmentDialog').hide()"
+                            styleClass="ui-button-outlined ui-button-secondary"
+                            process="@this" />
+                </p:dataList>
+
+                <h:outputText
+                        value="No slots available for this date."
+                        styleClass="text-danger small"
+                        rendered="#{empty artistAppointmentBean.availableSlots and artistAppointmentBean.selectedDate != null}" />
+
+            </p:outputPanel>
+
+        </div>
+    </h:form>
+</p:dialog>
+
+
+        <style>
+            .stat-card {
+                text-align: center;
+                padding: 15px;
+                margin: 5px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .ui-button-sm {
+                font-size: 12px;
+                padding: 4px 8px;
+                min-width: 80px;
+            }
+            .ui-g > div {
+                padding: 4px;
+            }
+            .action-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            .badge {
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 11px;
+                font-weight: bold;
+            }
+            .badge-success { background: #4CAF50; color: white; }
+            .badge-warning { background: #FF9800; color: white; }
+            .badge-danger { background: #F44336; color: white; }
+            .badge-info { background: #2196F3; color: white; }
+            .badge-secondary { background: #9E9E9E; color: white; }
+            .badge-primary { background: #9C27B0; color: white; }
+            
+            .label {
+                font-weight: bold;
+                padding-right: 15px;
+                text-align: right;
+                vertical-align: top;
+            }
+            .value {
+                padding-left: 10px;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .ui-g > div {
+                    padding: 2px;
+                }
+                .stat-card {
+                    margin: 2px;
+                    padding: 10px;
+                }
+                .ui-button-sm {
+                    font-size: 10px;
+                    padding: 3px 6px;
+                    min-width: 70px;
+                }
+            }
+        </style>
+
+    </ui:define>
+</ui:composition>

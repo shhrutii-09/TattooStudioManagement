@@ -28,7 +28,7 @@ public class Review implements Serializable {
     private AppUser artist;
 
     @Column(name = "RATING", nullable = false)
-    private Integer rating;
+    private Double rating;
 
     @Column(name = "COMMENTS", length = 500)
     private String comments;
@@ -47,8 +47,8 @@ public class Review implements Serializable {
     public AppUser getArtist() { return artist; }
     public void setArtist(AppUser artist) { this.artist = artist; }
 
-    public Integer getRating() { return rating; }
-    public void setRating(Integer rating) { this.rating = rating; }
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
 
     public String getComments() { return comments; }
     public void setComments(String comments) { this.comments = comments; }

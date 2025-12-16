@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/artist/templates/layout.xhtml">
+
+    <ui:define name="title">Manage Profile</ui:define>
+    <ui:define name="pageTitle">Manage Profile</ui:define>
+
+    <ui:define name="content">
+        <h:form id="profileForm">
+
+            <p:growl id="growl" showDetail="true" life="4000" />
+
+            <div class="profile-container">
+
+                <!-- ================= ACCOUNT DETAILS ================= -->
+                <div class="profile-section">
+                    <h2>Account Details</h2>
+
+                    <p:panelGrid columns="2" columnClasses="label-col,value-col" styleClass="profile-grid">
+
+                        <h:outputLabel for="fullName" value="Full Name:" />
+                        <p:inputText id="fullName"
+                                     value="#{artistProfileBean.profile.fullName}"
+                                     required="true"
+                                     styleClass="wide-input" />
+
+                        <h:outputLabel for="email" value="Email:" />
+                        <p:inputText id="email"
+                                     value="#{artistProfileBean.profile.email}"
+                                     required="true"
+                                     styleClass="wide-input" />
+
+                        <h:outputLabel for="phone" value="Phone:" />
+                        <p:inputText id="phone"
+                                     value="#{artistProfileBean.profile.phone}"
+                                     styleClass="wide-input" />
+
+                        <h:outputLabel for="username" value="Username:" />
+                        <p:inputText id="username"
+                                     value="#{artistProfileBean.profile.username}"
+                                     required="true"
+                                     styleClass="wide-input" />
+
+                        <h:outputLabel value="Role:" />
+                        <h:outputText value="#{artistProfileBean.profile.role}" />
+
+                        <h:outputLabel value="Verified:" />
+                        <h:outputText value="#{artistProfileBean.profile.verified ? 'Yes' : 'Pending'}" />
+
+                    </p:panelGrid>
+
+                    <p:commandButton value="Update Profile"
+                                     actionListener="#{artistProfileBean.saveDetails}"
+                                     update="profileForm growl"
+                                     styleClass="btn-primary" />
+                </div>
+
+                <!-- ================= PASSWORD ================= -->
+                <div class="profile-section">
+                    <h2>Change Password</h2>
+
+                    <p:panelGrid columns="2" columnClasses="label-col,value-col" styleClass="profile-grid">
+
+                        <h:outputLabel for="oldPass" value="Old Password:" />
+                        <p:password id="oldPass"
+                                    value="#{artistProfileBean.oldPassword}"
+                                    styleClass="wide-input" />
+
+                        <h:outputLabel for="newPass" value="New Password:" />
+                        <p:password id="newPass"
+                                    value="#{artistProfileBean.newPassword}"
+                                    styleClass="wide-input" />
+
+                    </p:panelGrid>
+
+                    <p:commandButton value="Change Password"
+                                     actionListener="#{artistProfileBean.updatePassword}"
+                                     update="profileForm growl"
+                                     styleClass="btn-primary" />
+                </div>
+
+                <!-- ================= EXPERIENCE ================= -->
+                <div class="profile-section">
+                    <h2>Experience</h2>
+
+                    <p:panelGrid columns="2" columnClasses="label-col,value-col" styleClass="profile-grid">
+
+                        <h:outputLabel for="portfolio" value="Portfolio Link:" />
+                        <p:inputText id="portfolio"
+                                     value="#{artistProfileBean.profile.portfolioLink}"
+                                     styleClass="wide-input" />
+
+                        <h:outputLabel for="specialties" value="Specialties:" />
+                        <p:inputTextarea id="specialties"
+                                         value="#{artistProfileBean.profile.specialties}"
+                                         rows="3"
+                                         styleClass="wide-input" />
+
+                        <h:outputLabel for="years" value="Years of Experience:" />
+                        <p:inputNumber id="years"
+                                       value="#{artistProfileBean.profile.yearsExperience}"
+                                       minValue="0"
+                                       styleClass="wide-input" />
+
+                        <h:outputLabel for="status" value="Status:" />
+                        <p:inputText id="status"
+                                     value="#{artistProfileBean.profile.status}"
+                                     styleClass="wide-input" />
+
+                    </p:panelGrid>
+
+                    <p:commandButton value="Save Experience"
+                                     actionListener="#{artistProfileBean.saveExperience}"
+                                     update="profileForm growl"
+                                     styleClass="btn-primary" />
+                </div>
+
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

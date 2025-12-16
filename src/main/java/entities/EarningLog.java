@@ -56,6 +56,16 @@ public class EarningLog implements Serializable {
     @JoinColumn(name = "PAYOUT_ID")
     private ArtistPayout payout;
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    
+@Column(name = "NOTES", columnDefinition = "TEXT")
+    private String notes;
 
     // --- Getters and Setters ---
     public Integer getLogId() { return logId; }

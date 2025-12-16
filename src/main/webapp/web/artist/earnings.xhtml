@@ -1,0 +1,93 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/web/artist/templates/layout.xhtml">
+
+    <!-- Page Meta -->
+    <ui:define name="title">My Earnings — InkFlow</ui:define>
+    <ui:define name="pageTitle">My Earnings</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="earningsForm">
+
+            <!-- Header -->
+            <section class="dashboard-header">
+                <h2>Earnings Overview</h2>
+                <p class="muted">Your completed appointments and payout status</p>
+            </section>
+
+            <!-- Summary -->
+            <section class="stats-grid">
+
+                <!-- Pending Earnings -->
+                <div class="stat-card warning">
+                    <h4>Pending Earnings</h4>
+                    <h2>
+                        <h:outputText value="#{artistEarningsBeanA.pendingTotal}">
+                            <f:convertNumber pattern="₹ #,##0.00"/>
+                        </h:outputText>
+                    </h2>
+                    <p class="muted">Awaiting admin payout</p>
+                </div>
+
+            </section>
+
+            <!-- Earnings Table -->
+            <section class="table-section">
+                <div class="table-header">
+                    <h3>Earning History</h3>
+                </div>
+
+                <p:dataTable id="earningsTable"
+                             value="#{artistEarningsBeanA.earnings}"
+                             var="e"
+                             paginator="true"
+                             rows="8"
+                             emptyMessage="No earnings recorded yet."
+                             styleClass="design-table">
+
+                    <!-- Date -->
+                    <p:column headerText="Date">
+                        <h:outputText value="#{e.calculatedAt}">
+                            <f:convertDateTime pattern="dd MMM yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <!-- Appointment -->
+                    <p:column headerText="Appointment ID">
+                        # #{e.appointment.appointmentId}
+                    </p:column>
+
+                    <!-- Total Paid -->
+                    <p:column headerText="Total Paid">
+                        <h:outputText value="#{e.totalAmount}">
+                            <f:convertNumber pattern="₹ #,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <!-- Artist Share -->
+                    <p:column headerText="Your Share">
+                        <h:outputText value="#{e.artistShare}">
+                            <f:convertNumber pattern="₹ #,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <!-- Status -->
+                    <p:column headerText="Status" style="text-align:center;">
+                        <span class="badge #{e.payoutStatus eq 'PENDING'
+                                             ? 'badge-warning'
+                                             : 'badge-success'}">
+                            #{e.payoutStatus}
+                        </span>
+                    </p:column>
+
+                </p:dataTable>
+            </section>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

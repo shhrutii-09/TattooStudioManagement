@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-title">InkFlow</div>
+<div class="brand-sub">Artist</div>
+</div>
+
+
+<nav class="nav-list">
+<ui:fragment rendered="#{userSessionBean.artist}">
+
+
+<h:link outcome="dashboard.xhtml" styleClass="nav-item">
+<i class="pi pi-home"></i><span>Dashboard</span>
+</h:link>
+
+
+<h:link outcome="artist-designs.xhtml" styleClass="nav-item">
+<i class="pi pi-image"></i><span>My Designs</span>
+</h:link>
+
+
+<h:link outcome="appointment.xhtml" styleClass="nav-item">
+<i class="pi pi-calendar"></i><span>Appointments</span>
+</h:link>
+
+
+<h:link outcome="artist_schedule.xhtml" styleClass="nav-item">
+<i class="pi pi-clock"></i><span>Schedule</span>
+</h:link>
+
+
+<h:link outcome="earnings.xhtml" styleClass="nav-item">
+<i class="pi pi-wallet"></i><span>Earnings</span>
+</h:link>
+
+
+<h:link outcome="artist-profile.xhtml" styleClass="nav-item">
+<i class="pi pi-user"></i><span>Profile</span>
+</h:link>
+
+
+</ui:fragment>
+
+
+<ui:fragment rendered="#{not userSessionBean.artist and userSessionBean.loggedIn}">
+<div style="padding:20px;text-align:center;color:#95a5a6;">
+<i class="pi pi-lock" style="font-size:2rem"></i>
+<p>Artist access required</p>
+</div>
+</ui:fragment>
+</nav>
+
+
+<div class="sidebar-bottom">
+<small class="muted">© InkFlow</small>
+</div>
+</aside>
+</ui:composition>

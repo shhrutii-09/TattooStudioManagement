@@ -81,6 +81,42 @@ public class AdminArtistsBean implements Serializable {
         }
     }
 
+    // Add this method to your AdminArtistsBean.java
+public String viewArtistTimeSlots(Long artistId) {
+    // Store the selected artist ID in session/flash scope
+    FacesContext facesContext = FacesContext.getCurrentInstance();
+    facesContext.getExternalContext().getFlash().put("selectedArtistId", artistId);
+    
+    // Navigate to the artist time slots page
+    return "artist-timeslots?faces-redirect=true";
+}
+
+// Add this method to your AdminArtistsBean.java
+public String viewArtistSchedule(Long artistId) {
+    try {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        // Redirect to artist-timeslots.xhtml with artistId parameter
+        return "artist-timeslots?faces-redirect=true&amp;artistId=" + artistId;
+    } catch (Exception e) {
+        e.printStackTrace();
+        FacesContext.getCurrentInstance().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
+                "Failed to navigate to schedule: " + e.getMessage()));
+        return null;
+    }
+}
+
+public long getVerifiedCount() {
+    return artists.stream().filter(a -> a.isVerified()).count();
+}
+
+public long getActiveCount() {
+    return artists.stream().filter(a -> a.isActive()).count();
+}
+
+// Fix the viewArtistSchedule method to redirect to correct page:
+
+    
     private Long getCurrentAdminId() {
         try {
             UserSessionBean usb = (UserSessionBean) FacesContext.getCurrentInstance()

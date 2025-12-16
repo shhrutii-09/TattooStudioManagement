@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="/web/templates/layout.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="artistId" value="#{artistScheduleBean.artistId}" />
+        <f:event type="preRenderView" listener="#{artistScheduleBean.init}" />
+    </f:metadata>
+
+    <ui:define name="title">Artist Schedule | InkFlow Admin</ui:define>
+
+    <ui:define name="pageTitle">
+        <div class="page-header">
+            <div class="artist-header">
+                <p:commandButton value="← Back to Artists"
+                                 icon="pi pi-arrow-left"
+                                 action="artists?faces-redirect=true"
+                                 styleClass="back-button p-mr-3" />
+                <div>
+                    <h2><i class="pi pi-calendar"></i> Artist Schedule</h2>
+                    <p class="artist-subtitle">
+                        Managing schedule for <strong>#{artistScheduleBean.artistName}</strong>
+                        (ID: #{artistScheduleBean.artistId})
+                    </p>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="scheduleForm">
+
+            <p:growl id="growl" showDetail="true" life="4000" />
+
+            <!-- Summary Stats -->
+            <h:panelGroup id="summaryStats" layout="block" class="artist-summary-card p-mb-4">
+                <div class="artist-quick-info">
+                    <div class="artist-avatar-small">
+                        <i class="pi pi-user"></i>
+                    </div>
+                    <div class="artist-details-compact">
+                        <h3>#{artistScheduleBean.artistName}</h3>
+                        <div class="artist-tags">
+                            <span class="artist-tag">
+                                <i class="pi pi-id-card"></i> ID: #{artistScheduleBean.artistId}
+                            </span>
+                            <span class="artist-tag">
+                                <i class="pi pi-envelope"></i> #{artistScheduleBean.artistEmail}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="artist-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">#{artistScheduleBean.totalSlots}</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item available">
+                        <span class="stat-number">#{artistScheduleBean.availableCount}</span>
+                        <span class="stat-label">Available</span>
+                    </div>
+                    <div class="stat-item booked">
+                        <span class="stat-number">#{artistScheduleBean.bookedCount}</span>
+                        <span class="stat-label">Booked</span>
+                    </div>
+                    <div class="stat-item blocked">
+                        <span class="stat-number">#{artistScheduleBean.blockedCount}</span>
+                        <span class="stat-label">Blocked</span>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <!-- Header + bulk actions -->
+            <div class="slots-summary p-mb-3">
+                <div class="summary-header">
+                    <h4><i class="pi pi-clock"></i> Time Slots</h4>
+                    <div class="summary-actions">
+                        <p:commandButton value="Bulk Block"
+                                         icon="pi pi-ban"
+                                         rendered="#{not empty artistScheduleBean.selectedSlots}"
+                                         styleClass="p-button-warning p-button-sm"
+                                         actionListener="#{artistScheduleBean.blockSelectedSlots}"
+                                         update="slotsTable summaryStats growl" />
+
+                        <p:commandButton value="Bulk Unblock"
+                                         icon="pi pi-unlock"
+                                         rendered="#{not empty artistScheduleBean.selectedSlots}"
+                                         styleClass="p-button-success p-button-sm p-ml-2"
+                                         actionListener="#{artistScheduleBean.unblockSelectedSlots}"
+                                         update="slotsTable summaryStats growl" />
+                    </div>
+                </div>
+
+                <p class="slot-count">Showing #{artistScheduleBean.timeSlots.size()} slot(s)</p>
+            </div>
+
+            <!-- Time Slots Table -->
+            <p:dataTable id="slotsTable"
+                         value="#{artistScheduleBean.timeSlots}"
+                         var="slot"
+                         selection="#{artistScheduleBean.selectedSlots}"
+                         rowKey="#{slot.slotId}"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="5,10,20"
+                         emptyMessage="No time slots found for this artist"
+                         styleClass="compact-table">
+
+                <p:column selectionMode="multiple" style="width:30px; text-align:center;" />
+
+                <p:column headerText="DATE" width="120">
+                    <div class="compact-date">
+                        <div class="date-day">
+                            #{slot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('EEE'))}
+                        </div>
+                        <div class="date-main">
+                            #{slot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('MMM dd'))}
+                        </div>
+                        <div class="date-year">
+                            #{slot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('yyyy'))}
+                        </div>
+                    </div>
+                </p:column>
+
+                <p:column headerText="TIME" width="140">
+                    <div class="compact-time">
+                        <i class="pi pi-clock" />
+                        #{slot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('h:mm a'))}
+                        -
+                        #{slot.endTime.format(java.time.format.DateTimeFormatter.ofPattern('h:mm a'))}
+                    </div>
+                </p:column>
+
+                <p:column headerText="STATUS" width="120">
+                    <span class="status-badge #{slot.status.toLowerCase()}">
+                        <i class="pi #{artistScheduleBean.getStatusIcon(slot.status)}"></i>
+                        #{slot.status}
+                    </span>
+                </p:column>
+
+                <p:column headerText="DETAILS" width="200">
+                    <h:panelGroup rendered="#{slot.blockReason != null}">
+                        <i class="pi pi-info-circle"></i>
+                        <span title="#{slot.blockReason}">
+                            #{fn:length(slot.blockReason) gt 20 ? fn:substring(slot.blockReason,0,20) + '...' : slot.blockReason}
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{slot.status eq 'BOOKED'}">
+                        <div><i class="pi pi-calendar"></i> Booked appointment</div>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{slot.status eq 'AVAILABLE'}">
+                        <div><i class="pi pi-check"></i> Available</div>
+                    </h:panelGroup>
+                </p:column>
+
+                <p:column headerText="ACTIONS" width="160">
+                    <div class="compact-actions">
+                        <!-- Block -->
+                        <p:commandButton icon="pi pi-ban"
+                                         title="Block Slot"
+                                         rendered="#{slot.status eq 'AVAILABLE'}"
+                                         styleClass="p-button-warning p-button-sm"
+                                         onclick="PF('blockDialog').show(); #{artistScheduleBean.selectedSlot = slot};" />
+
+                        <!-- Unblock -->
+                        <p:commandButton icon="pi pi-unlock"
+                                         title="Unblock Slot"
+                                         rendered="#{slot.status eq 'BLOCKED'}"
+                                         styleClass="p-button-success p-button-sm"
+                                         actionListener="#{artistScheduleBean.unblockSlot(slot.slotId)}"
+                                         update="slotsTable summaryStats growl" />
+
+                        <!-- View -->
+                        <p:commandButton icon="pi pi-eye"
+                                         title="View Details"
+                                         styleClass="p-button-info p-button-sm"
+                                         onclick="PF('detailsDialog').show(); #{artistScheduleBean.selectedSlot = slot};" />
+                    </div>
+                </p:column>
+
+            </p:dataTable>
+
+            <!-- Block Dialog -->
+            <p:dialog header="Block Time Slot"
+                      widgetVar="blockDialog"
+                      modal="true"
+                      width="420"
+                      appendTo="@(body)">
+
+                <div class="dialog-content">
+                    <h5>Block Slot for #{artistScheduleBean.artistName}</h5>
+
+                    <h:panelGroup rendered="#{artistScheduleBean.selectedSlot != null}">
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            #{artistScheduleBean.selectedSlot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('EEE, MMM dd yyyy'))}
+                        </p>
+
+                        <p>
+                            <i class="pi pi-clock"></i>
+                            #{artistScheduleBean.selectedSlot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('h:mm a'))}
+                            -
+                            #{artistScheduleBean.selectedSlot.endTime.format(java.time.format.DateTimeFormatter.ofPattern('h:mm a'))}
+                        </p>
+                    </h:panelGroup>
+
+                    <div class="p-field p-mt-3">
+                        <label>Reason for Blocking *</label>
+                        <p:inputTextarea value="#{artistScheduleBean.blockReason}"
+                                         rows="3"
+                                         style="width: 100%;"
+                                         required="true"
+                                         placeholder="Enter reason (e.g., maintenance)" />
+                    </div>
+                </div>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     onclick="PF('blockDialog').hide();"
+                                     type="button"
+                                     styleClass="p-button-secondary" />
+
+                    <p:commandButton value="Block Slot"
+                                     icon="pi pi-check"
+                                     actionListener="#{artistScheduleBean.blockSelectedSlots}"
+                                     update="slotsTable summaryStats growl"
+                                     oncomplete="if (!args.validationFailed) PF('blockDialog').hide();"
+                                     styleClass="p-button-warning p-ml-2" />
+                </f:facet>
+            </p:dialog>
+
+            <!-- View Details Dialog -->
+            <p:dialog header="Slot Details"
+                      widgetVar="detailsDialog"
+                      modal="true"
+                      width="450"
+                      appendTo="@(body)">
+
+                <h:panelGrid columns="1" rendered="#{artistScheduleBean.selectedSlot != null}">
+                    <h:outputText value="Start: #{artistScheduleBean.selectedSlot.startTime.format(java.time.format.DateTimeFormatter.ofPattern('EEE, MMM dd yyyy h:mm a'))}" />
+                    <h:outputText value="End: #{artistScheduleBean.selectedSlot.endTime.format(java.time.format.DateTimeFormatter.ofPattern('h:mm a'))}" />
+                    <h:outputText value="Status: #{artistScheduleBean.selectedSlot.status}" />
+                    <h:outputText rendered="#{artistScheduleBean.selectedSlot.blockReason != null}"
+                                  value="Block Reason: #{artistScheduleBean.selectedSlot.blockReason}" />
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Close" onclick="PF('detailsDialog').hide();" type="button" />
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

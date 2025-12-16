@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <footer class="client-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>InkFlow Studio</h3>
+                <p>Where imagination meets timeless art. Premium tattoo studio with certified artists and modern booking system.</p>
+                <div class="social-links" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <a href="#" class="social-icon" style="color: #CBD5E1;">Instagram</a>
+                    <a href="#" class="social-icon" style="color: #CBD5E1;">Facebook</a>
+                    <a href="#" class="social-icon" style="color: #CBD5E1;">Twitter</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <h:link value="Home" outcome="/web/client/home.xhtml" style="color: #CBD5E1;"/>
+                <h:link value="Browse Designs" outcome="/web/client/browseDesigns.xhtml" style="color: #CBD5E1;"/>
+                <h:link value="Artists" outcome="/web/client/browseArtists.xhtml" style="color: #CBD5E1;"/>
+                <h:link value="Book Appointment" outcome="/web/client/book.xhtml" style="color: #CBD5E1;"/>
+                <h:link value="About Us" outcome="/web/about.xhtml" style="color: #CBD5E1;"/>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Info</h3>
+                <p>📍 123 Art Street, Creative City</p>
+                <p>📞 (123) 456-7890</p>
+                <p>✉️ hello@inkflowstudio.com</p>
+                <p>🕒 Mon-Sat: 10AM - 8PM</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Subscribe for updates on new designs and promotions.</p>
+                <h:form styleClass="newsletter-form">
+                    <input type="email" placeholder="Your email" class="form-input" style="margin-bottom: 0.5rem;"/>
+                    <button type="submit" class="btn btn-accent">Subscribe</button>
+                </h:form>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2025 InkFlow Studio. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</ui:composition>

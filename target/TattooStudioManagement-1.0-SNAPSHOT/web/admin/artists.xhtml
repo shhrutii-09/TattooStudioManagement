@@ -6,137 +6,483 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/web/templates/layout.xhtml">
 
-    <ui:define name="title">Admin — Artists | InkFlow</ui:define>
-    <ui:define name="pageTitle">Artists</ui:define>
+    <ui:define name="title">Artists Management | InkFlow Admin</ui:define>
+    <ui:define name="pageTitle">
+        <div class="page-header">
+            <h2><i class="pi pi-users"></i> Artists Management</h2>
+            <p class="subtitle">Manage artists and their schedules</p>
+        </div>
+    </ui:define>
 
     <ui:define name="content">
-        <h:form id="artistsForm">
 
-            <!-- Growl for feedback -->
-            <p:growl id="msgs" showDetail="true" life="3500" />
+        <h:form id="artistsForm">
+            <p:growl id="growl" showDetail="true" life="4000" />
+
+            <!-- Quick Stats -->
+            <div class="stats-container p-grid p-mb-4">
+                <div class="p-col-12 p-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #e3f2fd;">
+                            <i class="pi pi-users" style="color: #2196f3;"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>#{adminArtistsBean.artists.size()}</h3>
+                            <p>Total Artists</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #e8f5e9;">
+                            <i class="pi pi-check-circle" style="color: #4caf50;"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>#{adminArtistsBean.getVerifiedCount()}</h3>
+                            <p>Verified</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fff3e0;">
+                            <i class="pi pi-clock" style="color: #ff9800;"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>#{adminArtistsBean.getActiveCount()}</h3>
+                            <p>Active</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fce4ec;">
+                            <i class="pi pi-calendar-plus" style="color: #e91e63;"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>#{adminArtistsBean.artists.size()}</h3>
+                            <p>Schedule Ready</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar p-p-3 p-mb-3" style="background: #f8f9fa; border-radius: 8px;">
+                <div class="p-grid p-align-center">
+                    <div class="p-col-12 p-md-8">
+                        <h4 style="margin: 0; color: #2c3e50;">Artists List</h4>
+                        <p class="muted" style="margin: 5px 0 0 0;">Manage and view artist schedules</p>
+                    </div>
+                    <div class="p-col-12 p-md-4">
+                        <div style="text-align: right;">
+                            <p:commandButton value="Refresh List" 
+                                           icon="pi pi-refresh"
+                                           action="#{adminArtistsBean.init}" 
+                                           update="artistsTable growl"
+                                           styleClass="p-button-outlined" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Artists Table -->
-            <p:dataTable id="artistsTable"
-                         value="#{adminArtistsBean.artists}"
-                         var="a"
-                         rows="12"
-                         paginator="true"
-                         paginatorPosition="bottom"
-                         emptyMessage="No artists found."
-                         styleClass="ui-datatable"
-                         rowKey="#{a.userId}">
+            <p:card style="border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <p:dataTable id="artistsTable"
+                           value="#{adminArtistsBean.artists}"
+                           var="artist"
+                           paginator="true"
+                           rows="10"
+                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                           rowsPerPageTemplate="5,10,20"
+                           emptyMessage="No artists found"
+                           styleClass="clean-table">
 
-                <p:column headerText="ID" style="width:70px">
-                    <h:outputText value="#{a.userId}" />
-                </p:column>
+                    <p:column headerText="ARTIST" width="200">
+                        <div class="artist-profile">
+                            <div class="artist-avatar">
+                                <i class="pi pi-user" style="font-size: 24px; color: #666;"></i>
+                            </div>
+                            <div class="artist-info">
+                                <h4>#{artist.fullName}</h4>
+                                <p class="muted">ID: #{artist.userId}</p>
+                            </div>
+                        </div>
+                    </p:column>
 
-                <p:column headerText="Name">
-                    <h:outputText value="#{a.fullName}" /><br/>
-                    <small class="muted">#{a.username}</small>
-                </p:column>
+                    <p:column headerText="CONTACT" width="200">
+                        <div class="contact-info">
+                            <p><i class="pi pi-envelope" style="margin-right: 8px; color: #666;"></i>#{artist.email}</p>
+                            <p><i class="pi pi-phone" style="margin-right: 8px; color: #666;"></i>#{artist.phone}</p>
+                        </div>
+                    </p:column>
 
-                <p:column headerText="Email">
-                    <h:outputText value="#{a.email}" />
-                </p:column>
+                    <p:column headerText="STATUS" width="120">
+                        <div class="status-container">
+                            <span class="status-badge #{artist.active ? 'active' : 'inactive'}">
+                                #{artist.active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span class="status-badge #{artist.verified ? 'verified' : 'unverified'}">
+                                #{artist.verified ? 'Verified' : 'Unverified'}
+                            </span>
+                        </div>
+                    </p:column>
 
-                <p:column headerText="Phone" style="width:120px">
-                    <h:outputText value="#{a.phone}" />
-                </p:column>
+<!--                    <p:column headerText="SCHEDULE" width="140">
+                        <div class="schedule-info">
+                            <p:commandButton value="View Schedule" 
+                                           icon="pi pi-calendar"
+                                           action="#{adminArtistsBean.viewArtistSchedule(artist.userId)}"
+                                           styleClass="p-button-primary p-button-sm schedule-btn"
+                                           immediate="true"
+                                           style="width: 100%;" />
+                        </div>
+                    </p:column>-->
 
-                <p:column headerText="Created" style="width:160px">
-                    <h:outputText value="#{a.createdAt}" />
-                </p:column>
+                    <p:column headerText="ACTIONS" width="180">
+                        <div class="action-buttons">
+                            <p:commandButton icon="pi pi-eye"
+                                           title="View Details"
+                                           process="@this"
+                                           update=":artistsForm:artistDialog :artistsForm:growl"
+                                           action="#{adminArtistsBean.viewArtist(artist.userId)}"
+                                           oncomplete="PF('artistDialog').show()"
+                                           styleClass="p-button-outlined p-button-sm" />
 
-                <p:column headerText="Status" style="width:160px">
-                    <h:outputText value="#{a.isActive ? 'Active' : 'Deactivated'}" /><br/>
-                    <h:outputText value="#{a.isVerified ? 'Verified' : 'Unverified'}"/>
-                </p:column>
+                            <p:commandButton icon="pi pi-shield"
+                                           rendered="#{not artist.verified}"
+                                           title="Verify"
+                                           process="@this"
+                                           update=":artistsForm:artistsTable :artistsForm:growl"
+                                           action="#{adminArtistsBean.verifyArtist(artist.userId, true)}"
+                                           styleClass="p-button-outlined p-button-success p-button-sm" />
 
-                <p:column headerText="Actions" style="width:260px">
-                    <!-- VIEW -->
-                    <p:commandButton icon="pi pi-eye" title="View"
-                 actionListener="#{adminArtistsBean.viewArtist(a.userId)}"
-                 update=":artistsForm:artistDialogWrapper :artistsForm:msgs"
-                 process="@this"
-                 oncomplete="PF('artistDlg').show()" />
+                            <p:commandButton icon="pi pi-ban"
+                                           rendered="#{artist.verified}"
+                                           title="Unverify"
+                                           process="@this"
+                                           update=":artistsForm:artistsTable :artistsForm:growl"
+                                           action="#{adminArtistsBean.verifyArtist(artist.userId, false)}"
+                                           styleClass="p-button-outlined p-button-warning p-button-sm" />
 
+                            <p:commandButton icon="pi pi-trash"
+                                           title="Delete"
+                                           onclick="PF('confirmDelete').show(); return false;"
+                                           styleClass="p-button-outlined p-button-danger p-button-sm">
+                                <f:setPropertyActionListener 
+                                    target="#{adminArtistsBean.artistToDeleteId}" 
+                                    value="#{artist.userId}" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </p:card>
 
+            <!-- Artist Details Dialog -->
+            <p:dialog id="artistDialog"
+                      widgetVar="artistDialog"
+                      header="Artist Details"
+                      modal="true"
+                      appendTo="@(body)"
+                      width="500"
+                      resizable="false">
+
+                <div class="dialog-content">
+                    <h:panelGrid columns="2" cellpadding="15" style="width: 100%;" columnClasses="label,value">
+                        <strong>Artist ID:</strong>
+                        <span>##{adminArtistsBean.viewingArtist.userId}</span>
+                        
+                        <strong>Full Name:</strong>
+                        <span>#{adminArtistsBean.viewingArtist.fullName}</span>
+                        
+                        <strong>Username:</strong>
+                        <span>@#{adminArtistsBean.viewingArtist.username}</span>
+                        
+                        <strong>Email:</strong>
+                        <span>#{adminArtistsBean.viewingArtist.email}</span>
+                        
+                        <strong>Phone:</strong>
+                        <span>#{adminArtistsBean.viewingArtist.phone}</span>
+                        
+                        <strong>Status:</strong>
+                        <div>
+                            <span class="status-badge #{adminArtistsBean.viewingArtist.active ? 'active' : 'inactive'}">
+                                #{adminArtistsBean.viewingArtist.active ? 'Active' : 'Inactive'}
+                            </span>
+                            <span class="status-badge #{adminArtistsBean.viewingArtist.verified ? 'verified' : 'unverified'}">
+                                #{adminArtistsBean.viewingArtist.verified ? 'Verified' : 'Unverified'}
+                            </span>
+                        </div>
+                    </h:panelGrid>
                     
-                    <!-- ACTIVATE / DEACTIVATE -->
-                    <p:commandButton icon="#{a.isActive ? 'pi pi-ban' : 'pi pi-check'}"
-                                     title="#{a.isActive ? 'Deactivate' : 'Activate'}"
-                                     update=":artistsForm:artistsTable :artistsForm:msgs"
-                                     process="@this"
-                                     actionListener="#{adminArtistsBean.toggleActive(a.userId, not a.isActive)}"
-                                     style="margin-left:6px" />
+                    <div class="dialog-actions p-mt-4" style="text-align: right; border-top: 1px solid #eee; padding-top: 15px;">
+                        <p:commandButton value="View Schedule" 
+                                       icon="pi pi-calendar"
+                                       action="#{adminArtistsBean.viewArtistSchedule(adminArtistsBean.viewingArtist.userId)}"
+                                       immediate="true"
+                                       styleClass="p-button-primary" />
+                        <p:commandButton value="Close" 
+                                       icon="pi pi-times"
+                                       onclick="PF('artistDialog').hide()"
+                                       styleClass="p-button-secondary" />
+                    </div>
+                </div>
+            </p:dialog>
 
-                    <!-- VERIFY / UNVERIFY -->
-                    <p:commandButton icon="pi pi-shield" title="Verify"
-                                     rendered="#{not a.isVerified}"
-                                     update=":artistsForm:artistsTable :artistsForm:msgs"
-                                     process="@this"
-                                     actionListener="#{adminArtistsBean.verifyArtist(a.userId, true)}"
-                                     style="margin-left:6px" />
-
-                    <p:commandButton icon="pi pi-times" title="Unverify"
-                                     rendered="#{a.isVerified}"
-                                     update=":artistsForm:artistsTable :artistsForm:msgs"
-                                     process="@this"
-                                     actionListener="#{adminArtistsBean.verifyArtist(a.userId, false)}"
-                                     style="margin-left:6px" />
-
-                    <!-- DELETE -->
-                    <p:commandButton icon="pi pi-trash" title="Delete"
-                                     rendered="#{a.role.roleName ne 'ADMIN'}"
-                                     onclick="PF('confirmDel').show(); return false;"
-                                     process="@this"
-                                     style="margin-left:6px">
-                        <f:setPropertyActionListener target="#{adminArtistsBean.artistToDeleteId}" value="#{a.userId}" />
-                    </p:commandButton>
-                </p:column>
-            </p:dataTable>
-
-            <!-- View Dialog -->
-            <h:panelGroup id="artistDialogWrapper">
-    <p:dialog id="artistViewDialog"
-              widgetVar="artistDlg"
-              header="Artist Details"
-              modal="true"
-              resizable="false"
-              appendTo="@(body)">
-              
-        <h:panelGrid columns="2" columnClasses="label-col,value-col" style="width:100%">
-            <h:outputText value="ID:" /><h:outputText value="#{adminArtistsBean.viewingArtist.userId}" />
-            <h:outputText value="Full Name:" /><h:outputText value="#{adminArtistsBean.viewingArtist.fullName}" />
-            <h:outputText value="Username:" /><h:outputText value="#{adminArtistsBean.viewingArtist.username}" />
-            <h:outputText value="Email:" /><h:outputText value="#{adminArtistsBean.viewingArtist.email}" />
-            <h:outputText value="Phone:" /><h:outputText value="#{adminArtistsBean.viewingArtist.phone}" />
-            <h:outputText value="Active:" /><h:outputText value="#{adminArtistsBean.viewingArtist.active ? 'Yes' : 'No'}" />
-            <h:outputText value="Verified:" /><h:outputText value="#{adminArtistsBean.viewingArtist.isVerified ? 'Yes' : 'No'}" />
-        </h:panelGrid>
-
-        <f:facet name="footer">
-            <p:commandButton value="Close" type="button" onclick="PF('artistDlg').hide()" />
-        </f:facet>
-
-    </p:dialog>
-</h:panelGroup>
-
-
-
-            <!-- Confirm Delete -->
-            <p:confirmDialog widgetVar="confirmDel"
+            <!-- Delete Confirmation Dialog -->
+            <p:confirmDialog widgetVar="confirmDelete"
                              header="Confirm Delete"
-                             message="Are you sure you want to delete this artist?">
-                <p:commandButton value="Yes, Delete"
-                                 update=":artistsForm:artistsTable :artistsForm:msgs"
-                                 actionListener="#{adminArtistsBean.deleteArtist(adminArtistsBean.artistToDeleteId)}"
-                                 oncomplete="PF('confirmDel').hide();" />
-                <p:commandButton value="Cancel" type="button"
-                                 styleClass="ui-button-secondary"
-                                 onclick="PF('confirmDel').hide();" />
+                             message="Are you sure you want to delete this artist?"
+                             severity="alert"
+                             width="400">
+                <p:commandButton value="Delete"
+                                 action="#{adminArtistsBean.deleteArtist(adminArtistsBean.artistToDeleteId)}"
+                                 update=":artistsForm:artistsTable :artistsForm:growl"
+                                 oncomplete="PF('confirmDelete').hide()"
+                                 styleClass="p-button-danger" />
+                <p:commandButton value="Cancel"
+                                 type="button"
+                                 onclick="PF('confirmDelete').hide()"
+                                 styleClass="p-button-secondary" />
             </p:confirmDialog>
 
         </h:form>
+
+        <!-- CSS Styles -->
+        <style type="text/css">
+            /* Page Header */
+            .page-header {
+                margin-bottom: 30px;
+            }
+            .page-header h2 {
+                color: #2c3e50;
+                margin-bottom: 5px;
+            }
+            .page-header .subtitle {
+                color: #6c757d;
+                font-size: 16px;
+            }
+            
+            /* Stats Cards */
+            .stats-container {
+                margin-bottom: 30px;
+            }
+            .stat-card {
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+                display: flex;
+                align-items: center;
+                transition: transform 0.3s ease;
+            }
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+            }
+            .stat-icon i {
+                font-size: 24px;
+            }
+            .stat-content h3 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                color: #2c3e50;
+            }
+            .stat-content p {
+                margin: 5px 0 0 0;
+                color: #6c757d;
+                font-size: 14px;
+            }
+            
+            /* Action Bar */
+            .action-bar {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border: 1px solid #dee2e6;
+            }
+            
+            /* Table Styles */
+            .clean-table {
+                border: none;
+            }
+            .clean-table .ui-datatable-header {
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin-bottom: 15px;
+            }
+            .clean-table .ui-datatable-thead th {
+                background: #f8f9fa;
+                color: #495057;
+                font-weight: 600;
+                border: none;
+                padding: 15px;
+                border-bottom: 2px solid #dee2e6;
+            }
+            .clean-table .ui-datatable-tbody td {
+                padding: 15px;
+                border-bottom: 1px solid #e9ecef;
+                vertical-align: middle;
+            }
+            .clean-table .ui-datatable-tbody tr:hover {
+                background-color: #f8fafc;
+            }
+            
+            /* Artist Profile */
+            .artist-profile {
+                display: flex;
+                align-items: center;
+            }
+            .artist-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: #f0f4f8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+            }
+            .artist-info h4 {
+                margin: 0 0 5px 0;
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            .artist-info .muted {
+                color: #6c757d;
+                font-size: 12px;
+                margin: 0;
+            }
+            
+            /* Contact Info */
+            .contact-info p {
+                margin: 0 0 5px 0;
+                color: #495057;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+            
+            /* Status Badges */
+            .status-container {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .status-badge {
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                display: inline-block;
+                text-align: center;
+            }
+            .status-badge.active {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            .status-badge.inactive {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+            .status-badge.verified {
+                background: #d1ecf1;
+                color: #0c5460;
+                border: 1px solid #bee5eb;
+            }
+            .status-badge.unverified {
+                background: #fff3cd;
+                color: #856404;
+                border: 1px solid #ffeaa7;
+            }
+            
+            /* Schedule Button */
+            .schedule-btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border: none !important;
+                color: white !important;
+                transition: all 0.3s ease !important;
+            }
+            .schedule-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4) !important;
+            }
+            
+            /* Action Buttons */
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
+            .p-button-outlined {
+                background: transparent !important;
+            }
+            .p-button-sm {
+                padding: 0.3rem 0.6rem !important;
+                font-size: 13px !important;
+            }
+            
+            /* Dialog Styles */
+            .dialog-content {
+                padding: 10px;
+            }
+            .dialog-content .label {
+                font-weight: 600;
+                color: #495057;
+                text-align: right;
+                padding-right: 15px;
+            }
+            .dialog-content .value {
+                color: #2c3e50;
+                padding-left: 15px;
+            }
+            .dialog-actions {
+                text-align: right;
+            }
+            
+            /* Utility Classes */
+            .muted {
+                color: #6c757d !important;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .stat-card {
+                    margin-bottom: 15px;
+                }
+                .artist-profile {
+                    flex-direction: column;
+                    text-align: center;
+                }
+                .artist-avatar {
+                    margin-right: 0;
+                    margin-bottom: 10px;
+                }
+                .action-buttons {
+                    flex-direction: column;
+                }
+                .schedule-btn {
+                    width: 100%;
+                }
+                .dialog-content .label {
+                    text-align: left;
+                    padding-right: 0;
+                }
+                .dialog-content .value {
+                    padding-left: 0;
+                }
+            }
+        </style>
+
     </ui:define>
 </ui:composition>

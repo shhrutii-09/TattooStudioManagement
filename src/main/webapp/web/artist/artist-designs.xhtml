@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/web/artist/templates/layout.xhtml">
+
+    <ui:define name="title">My Designs — InkFlow</ui:define>
+    <ui:define name="pageTitle">My Tattoo Designs</ui:define>
+
+    <ui:define name="content">
+
+        <!-- MAIN FORM (TABLE + ACTION BUTTONS) -->
+        <h:form id="designForm">
+
+            <p:growl id="msg" showDetail="true" />
+
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <h2>My Tattoo Designs</h2>
+                <p class="muted">Manage your uploaded tattoo designs</p>
+            </section>
+
+            <!-- Table Section -->
+            <section class="table-section">
+                <div class="table-header">
+                    <h3>Design List</h3>
+
+                    <p:commandButton value="Add New Design"
+                                     icon="pi pi-plus"
+                                     styleClass="ui-button-success"
+                                     actionListener="#{artistDesignBean.prepareCreate}"
+                                     process="@this"
+                                     update="designDialog"
+                                     oncomplete="PF('designDlg').show()" />
+                </div>
+
+                <p:dataTable id="designTable"
+                             value="#{artistDesignBean.designs}"
+                             var="d"
+                             paginator="true"
+                             rows="6"
+                             emptyMessage="No active designs uploaded yet."
+                             styleClass="design-table">
+
+                    <!-- Image -->
+                    <p:column headerText="Image" style="width:100px; text-align:center;">
+                        <h:graphicImage value="#{d.imagePath}" width="70" styleClass="rounded-img"/>
+                    </p:column>
+
+                    <!-- Title -->
+                    <p:column headerText="Title" sortBy="#{d.title}">
+                        #{d.title}
+                    </p:column>
+
+                    <!-- Style -->
+                    <p:column headerText="Style">
+                        <span class="muted">#{d.style}</span>
+                    </p:column>
+
+                    <!-- Price -->
+                    <p:column headerText="Price" style="width:90px;">
+                        <h:outputText value="#{d.price}">
+                            <f:convertNumber pattern="₹ #,##0.00"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <!-- Likes -->
+                    <p:column headerText="Likes" style="width:60px; text-align:center;">
+                        <span class="badge badge-info">
+                            <i class="pi pi-heart"></i> #{d.totalLikes}
+                        </span>
+                    </p:column>
+
+                    <!-- Favs -->
+                    <p:column headerText="Favs" style="width:60px; text-align:center;">
+                        <span class="badge badge-warning">
+                            <i class="pi pi-star"></i> #{d.totalFavourites}
+                        </span>
+                    </p:column>
+
+                    <!-- Status -->
+                    <p:column headerText="Status" style="width:120px; text-align:center;">
+                        <h:panelGroup rendered="#{d.banned}">
+                            <span class="badge badge-danger" title="Reason: #{d.bannedReason}">
+                                <i class="pi pi-ban"></i> BANNED
+                            </span>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{!d.banned}">
+                            <span class="badge badge-success">
+                                <i class="pi pi-check"></i> Active
+                            </span>
+                        </h:panelGroup>
+                    </p:column>
+
+                    <!-- Actions -->
+                    <p:column headerText="Actions" style="width:120px; text-align:center;">
+
+                        <p:commandButton icon="pi pi-pencil"
+                                         title="Edit Design"
+                                         styleClass="ui-button-rounded ui-button-text"
+                                         actionListener="#{artistDesignBean.prepareEdit(d)}"
+                                         process="@this"
+                                         update="designDialog"
+                                         oncomplete="PF('designDlg').show()" />
+
+                        <p:commandButton icon="pi pi-trash"
+                                         title="Delete Design"
+                                         styleClass="ui-button-rounded ui-button-text ui-button-danger"
+                                         actionListener="#{artistDesignBean.deleteDesign(d.designId)}"
+                                         update="designTable">
+                            <p:confirm header="Confirm Delete"
+                                       message="Are you sure you want to remove this design?"
+                                       icon="pi pi-exclamation-triangle" />
+                        </p:commandButton>
+
+                    </p:column>
+
+                </p:dataTable>
+            </section>
+
+        </h:form>
+
+        <!-- DIALOG (SEPARATE FORM — CORRECT) -->
+        <p:dialog id="designDialog"
+                  header="#{artistDesignBean.editMode ? 'Edit Design' : 'New Design'}"
+                  widgetVar="designDlg"
+                  modal="true"
+                  responsive="true"
+                  appendTo="@(body)"
+                  styleClass="dialog-clean">
+
+            <h:form id="dialogForm" enctype="multipart/form-data">
+
+                <p:messages showDetail="true" />
+
+                <p:panelGrid columns="2" layout="grid" styleClass="form-grid">
+
+                    <p:outputLabel for="title" value="Title" />
+                    <p:inputText id="title"
+                                 value="#{artistDesignBean.currentDesign.title}"
+                                 required="true" />
+
+                    <p:outputLabel for="desc" value="Description" />
+                    <p:inputTextarea id="desc"
+                                     value="#{artistDesignBean.currentDesign.description}"
+                                     rows="3" />
+
+                    <p:outputLabel for="imageUrl" value="Image URL *" />
+<p:inputText id="imageUrl"
+             value="#{artistDesignBean.currentDesign.imageUrl}"
+             required="true"
+             placeholder="https://example.com/image.jpg"
+             style="width:100%" />
+
+
+                    <p:outputLabel for="style" value="Style" />
+                    <p:inputText id="style"
+                                 value="#{artistDesignBean.currentDesign.style}" />
+
+                    <p:outputLabel for="price" value="Price (₹)" />
+                    <p:inputText id="price"
+                                 value="#{artistDesignBean.currentDesign.price}">
+                        <f:convertNumber pattern="#0.00" />
+                    </p:inputText>
+
+                </p:panelGrid>
+
+                <div class="dialog-actions">
+
+                    <p:commandButton value="Save"
+                                     icon="pi pi-check"
+                                     action="#{artistDesignBean.saveDesign}"
+                                     update=":designForm:designTable :designForm:msg"
+                                     oncomplete="if (!args.validationFailed) PF('designDlg').hide()" />
+
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     styleClass="ui-button-secondary"
+                                     immediate="true"
+                                     onclick="PF('designDlg').hide(); return false;" />
+                </div>
+
+            </h:form>
+        </p:dialog>
+
+        <!-- GLOBAL CONFIRM -->
+        <p:confirmDialog global="true">
+            <p:commandButton value="Yes" type="button"
+                             styleClass="ui-confirmdialog-yes ui-button-danger" />
+            <p:commandButton value="No" type="button"
+                             styleClass="ui-confirmdialog-no ui-button-secondary" />
+        </p:confirmDialog>
+
+    </ui:define>
+</ui:composition>

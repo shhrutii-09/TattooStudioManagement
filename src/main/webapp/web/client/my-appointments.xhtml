@@ -1,0 +1,258 @@
+<ui:composition template="/web/client/clientTemplate.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions">
+
+    <ui:define name="title">My Appointments - InkFlow Studio</ui:define>
+
+    <ui:define name="styles">
+        <style>
+            .appointments-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 2rem 1.5rem;
+            }
+
+            .appointments-hero {
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                color: white;
+                padding: 2rem;
+                border-radius: 1.25rem;
+                margin-bottom: 2rem;
+            }
+
+            .pay-btn {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1.2rem;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(40,167,69,0.35);
+}
+
+.pay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(40,167,69,0.45);
+}
+
+.pay-btn:active {
+    transform: scale(0.98);
+}
+
+            
+            .appointments-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+                gap: 2rem;
+            }
+
+            .appointment-card {
+                background: white;
+                border-radius: 1rem;
+                padding: 1.75rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                border: 1px solid #f0f0f0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .appointment-card h3 {
+                margin-bottom: 0.75rem;
+                color: #1a1a2e;
+            }
+
+            .appointment-image {
+                width: 100%;
+                border-radius: 0.75rem;
+                margin-bottom: 1rem;
+                max-height: 260px;
+                object-fit: cover;
+            }
+
+            .status-badge {
+                padding: 0.5rem 0.9rem;
+                border-radius: 1rem;
+                font-weight: 700;
+                display: inline-block;
+                margin-top: 0.5rem;
+                color: white;
+            }
+
+            .status-pending { background: #f0ad4e; }
+            .status-confirmed { background: #5cb85c; }
+            .status-paid { background: #0275d8; }
+            .status-cancelled { background: #d9534f; }
+            .status-completed { background: #5bc0de; }
+
+            .appointment-actions {
+                margin-top: 1rem;
+            }
+
+            .appointment-actions h:commandButton {
+                margin-top: 0.5rem;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="appointments-container">
+            
+            <h:panelGroup rendered="#{not empty myAppointmentsBean.lastPaidAppointment}">
+    <div style="
+        background:#e6fffa;
+        border:1px solid #38b2ac;
+        padding:1rem;
+        border-radius:0.75rem;
+        margin-bottom:2rem;
+    ">
+        <h3>🧾 Payment Receipt</h3>
+
+        <p>
+            Appointment ID:
+            #{myAppointmentsBean.lastPaidAppointment.appointmentId}
+        </p>
+
+        <p>
+            Amount Paid:
+            ₹#{myAppointmentsBean.lastPaidAppointment.payment.amount}
+        </p>
+
+        <p>
+            Transaction ID:
+            #{myAppointmentsBean.lastPaidAppointment.payment.transactionId}
+        </p>
+
+        <h:commandButton
+            value="Download Receipt (PDF)"
+            action="#{myAppointmentsBean.downloadInvoice(
+                     myAppointmentsBean.lastPaidAppointment)}"
+            styleClass="pay-btn" />
+    </div>
+</h:panelGroup>
+
+            
+            <section class="appointments-hero">
+                <h1>My Appointments</h1>
+                <p>View and manage your tattoo appointments here. Showing 
+                <h:outputText value="#{fn:length(myAppointmentsBean.appointments)}" /> records.
+                </p>
+            </section>
+
+            <h:form id="appointmentsForm">
+
+                <div class="appointments-grid">
+                    <ui:repeat value="#{myAppointmentsBean.appointments}" var="appt">
+
+                        <div class="appointment-card">
+                            
+                            <h:graphicImage value="#{appt.design.imagePath}"
+                rendered="#{not empty appt.design and not empty appt.design.imagePath}"
+                styleClass="appointment-image"/>
+
+                            
+                            <h:panelGroup rendered="#{empty appt.design}">
+                                <div style="height: 260px; background: #eee; border-radius: 0.75rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: #555;">
+                                    Custom Design / Design Not Found
+                                </div>
+                            </h:panelGroup>
+
+                            <h3>
+                                <h:outputText value="#{not empty appt.design ? appt.design.title : 'Custom Tattoo'}" />
+                            </h3>
+                            <p>
+                                <strong>Artist:</strong> 
+                                <h:outputText value="#{not empty appt.artist ? appt.artist.fullName : 'N/A'}" />
+                            </p>
+                            
+                            <p>
+                                <strong>Date:</strong> 
+                                <h:outputText value="#{appt.appointmentDateTime}" rendered="#{not empty appt.appointmentDateTime}">
+                                    <f:convertDateTime pattern="MMM dd, yyyy"/>
+                                </h:outputText>
+                                <h:outputText value="Date TBC" rendered="#{empty appt.appointmentDateTime}"/><br/>
+                                
+                                <strong>Time:</strong> 
+                                <h:outputText value="#{appt.appointmentDateTime}" rendered="#{not empty appt.appointmentDateTime}">
+                                    <f:convertDateTime pattern="h:mm a"/>
+                                </h:outputText>
+                                <h:outputText value="Time TBC" rendered="#{empty appt.appointmentDateTime}"/>
+                            </p>
+
+                            <h:panelGroup>
+                                <h:outputText value="#{appt.status}" 
+                                              styleClass="status-badge 
+                                                          #{myAppointmentsBean.isPending(appt) ? 'status-pending' : ''} 
+                                                          #{myAppointmentsBean.isConfirmedButNotPaid(appt) ? 'status-confirmed' : ''} 
+                                                          #{myAppointmentsBean.isPaidAndConfirmed(appt) ? 'status-paid' : ''} 
+                                                          #{myAppointmentsBean.isCancelled(appt) ? 'status-cancelled' : ''} 
+                                                          #{myAppointmentsBean.isCompleted(appt) ? 'status-completed' : ''}"/>
+                            </h:panelGroup>
+
+                            <div class="appointment-actions">
+                                
+                                <h:panelGroup rendered="#{myAppointmentsBean.isPending(appt)}">
+                                    🟡 Waiting for approval<br/>
+                                    ⏳ Please wait for artist confirmation
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{myAppointmentsBean.isConfirmedButNotPaid(appt)}">
+    🟢 Confirmed<br/>
+    ⏰ Pay before the session time to avoid cancellation<br/>
+
+    <h:commandButton
+        value="Pay Now"
+        action="#{myAppointmentsBean.payNow(appt)}"
+        styleClass="pay-btn" />
+</h:panelGroup>
+
+<h:panelGroup rendered="#{myAppointmentsBean.isPaid(appt)}">
+
+    <span class="status-badge status-paid">
+        💳 Paid Already
+    </span>
+    <br/>
+
+    <h:panelGroup rendered="#{myAppointmentsBean.isUpcomingPaid(appt)}">
+        ⏰ Session Upcoming<br/>
+        📅 Please arrive on time
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{myAppointmentsBean.isPastPaid(appt)}">
+        🏁 Session Completed<br/>
+        🙌 Thank you for choosing InkFlow
+    </h:panelGroup>
+
+</h:panelGroup>
+
+
+                                <h:panelGroup rendered="#{myAppointmentsBean.isCancelled(appt)}">
+                                    🔴 Cancelled<br/>
+                                    Reason: #{appt.cancellationReason != null ? appt.cancellationReason : 'Payment not completed in time'}
+                                </h:panelGroup>
+
+                                <h:panelGroup rendered="#{myAppointmentsBean.isCompleted(appt)}">
+                                    🏁 Completed<br/>
+                                    <h:commandButton value="⭐ Leave Feedback" 
+                                                     action="#{myAppointmentsBean.leaveFeedback(appt)}" 
+                                                     styleClass="submit-btn"/>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+
+                    </ui:repeat>
+                </div>
+
+            </h:form>
+        </div>
+    </ui:define>
+</ui:composition>

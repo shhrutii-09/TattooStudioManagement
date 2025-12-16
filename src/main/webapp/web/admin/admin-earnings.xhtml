@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/web/templates/layout.xhtml"> <ui:define name="title">Admin — System Earnings | InkFlow</ui:define>
+    <ui:define name="pageTitle">System Earnings Dashboard</ui:define>
+
+    <ui:define name="content">
+        <h:form id="adminEarningsForm">
+            <p:growl id="growl" showDetail="true" life="4000" />
+            
+            <h2>Overall Financial Summary</h2>
+            
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                
+                <p:panel header="Overall Gross Revenue (Total Client Payments)" styleClass="stat-card blue">
+                    <h3 style="margin:0;"><h:outputText value="#{adminEarningBean.summary.totalGrossRevenue}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" maxFractionDigits="2"/>
+                    </h:outputText></h3>
+                    <p>Total funds collected (Gross)</p>
+                </p:panel>
+                
+                <p:panel header="Total Net Realized Profit (Admin's Profit)" styleClass="stat-card green">
+                    <h3><h:outputText value="#{adminEarningBean.summary.totalAdminNetRealized}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" maxFractionDigits="2"/>
+                    </h:outputText></h3>
+                    <p>Profit after paying artists (Net Realized)</p>
+                </p:panel>
+                
+            </p:panelGrid>
+
+            <h3>Pending Profit / Liabilities</h3>
+            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                
+                <p:panel header="Pending Artist Liability" styleClass="stat-card orange">
+                    <h3><h:outputText value="#{adminEarningBean.summary.totalArtistPendingShare}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" maxFractionDigits="2"/>
+                    </h:outputText></h3>
+                    <p>Money owed to artists (Still Pending)</p>
+                </p:panel>
+
+                <p:panel header="Pending Admin Profit Margin" styleClass="stat-card yellow">
+                    <h3><h:outputText value="#{adminEarningBean.summary.totalAdminPendingShare}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" maxFractionDigits="2"/>
+                    </h:outputText></h3>
+                    <p>Your calculated profit on pending services</p>
+                </p:panel>
+                
+                <p:panel header="Total Paid to Artists (All Time)" styleClass="stat-card red">
+                    <h3><h:outputText value="#{adminEarningBean.summary.totalArtistPaidShare}">
+                        <f:convertNumber type="currency" currencySymbol="₹" groupingUsed="true" maxFractionDigits="2"/>
+                    </h:outputText></h3>
+                    <p>Historical artist payouts</p>
+                </p:panel>
+                
+            </p:panelGrid>
+            
+            <style>
+                .stat-card { text-align:center; padding:15px; margin:5px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.08); }
+                .blue { background-color:#E3F2FD; color:#2196F3; }
+                .green { background-color:#E8F5E9; color:#4CAF50; }
+                .orange { background-color:#FFF3E0; color:#FF9800; }
+                .yellow { background-color:#FFFDE7; color:#FFC107; }
+                .red { background-color:#FFEBEE; color:#F44336; }
+            </style>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

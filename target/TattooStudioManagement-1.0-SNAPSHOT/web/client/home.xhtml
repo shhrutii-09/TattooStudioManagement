@@ -1,15 +1,529 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/XHtml.xhtml to edit this template
--->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <title>TODO supply a title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<ui:composition template="/web/client/clientTemplate.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="title">InkFlow Studio — Timeless Art, Modern Experience</ui:define>
+    
+    <ui:define name="styles">
+        <style>
+            /* Hero Section */
+            .hero-section {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4rem;
+                align-items: center;
+                padding: 4rem 0;
+                min-height: 80vh;
+            }
+            
+            .hero-title {
+                font-size: 3.5rem;
+                line-height: 1.1;
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.25rem;
+                color: var(--ash-gray);
+                margin-bottom: 2rem;
+                max-width: 90%;
+            }
+            
+            .hero-visual {
+                position: relative;
+            }
+            
+            .hero-image {
+                height: 400px;
+                background: 
+                    linear-gradient(45deg, rgba(26, 26, 46, 0.8), rgba(45, 48, 71, 0.6)),
+                    url('https://images.unsplash.com/photo-1605649487212-2bd9a18c1bab?auto=format&amp;fit=crop&amp;w=800');
+                background-size: cover;
+                background-position: center;
+                border-radius: var(--radius-lg);
+                box-shadow: 0 20px 60px var(--shadow-strong);
+            }
+            
+            /* Features */
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2rem;
+                margin: 3rem 0;
+            }
+            
+            .feature-card {
+                text-align: center;
+                padding: 2rem;
+                border-radius: var(--radius-lg);
+                background: white;
+                border-top: 4px solid var(--gold-accent);
+            }
+            
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                background: var(--gradient-gold);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem;
+                font-size: 1.5rem;
+                color: white;
+            }
+            
+            /* Designs Grid */
+            .designs-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 2rem;
+                margin-top: 2rem;
+            }
+            
+            /* Artists Grid */
+            .artists-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+                margin-top: 2rem;
+            }
+            
+            .artist-card {
+                text-align: center;
+                padding: 2rem;
+                border-radius: var(--radius-lg);
+                background: white;
+                border-top: 4px solid var(--sage-green);
+            }
+            
+            .artist-avatar {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                margin: 0 auto 1.5rem;
+                background: var(--gradient-ink);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+                color: white;
+                font-weight: 600;
+            }
+            
+            /* CTA Section */
+            .cta-section {
+                background: var(--gradient-ink);
+                color: white;
+                padding: 4rem 2rem;
+                border-radius: var(--radius-lg);
+                text-align: center;
+                margin: 4rem 0;
+            }
+            
+            .cta-title {
+                color: white;
+                margin-bottom: 1rem;
+            }
+            
+            .cta-buttons {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                margin-top: 2rem;
+                flex-wrap: wrap;
+            }
+            
+            /* Dashboard Specific */
+            .dashboard-header {
+                background: var(--gradient-ink);
+                color: white;
+                padding: 3rem 2rem;
+                border-radius: var(--radius-lg);
+                margin-bottom: 3rem;
+            }
+            
+            .welcome-text {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            /* Empty States */
+            .empty-state {
+                text-align: center;
+                padding: 3rem;
+                background: white;
+                border-radius: var(--radius-lg);
+                border: 2px dashed var(--light-gray);
+            }
+            
+            .empty-icon {
+                font-size: 3rem;
+                color: var(--ash-gray);
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive */
+            @media (max-width: 1024px) {
+                .hero-section {
+                    grid-template-columns: 1fr;
+                    text-align: center;
+                }
+                
+                .hero-subtitle {
+                    margin: 0 auto 2rem;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .hero-title {
+                    font-size: 2.5rem;
+                }
+                
+                .cta-buttons {
+                    flex-direction: column;
+                }
+                
+                .cta-buttons .btn {
+                    width: 100%;
+                }
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <!-- ========================================================= -->
+        <!-- IF USER IS LOGGED IN → SHOW DASHBOARD HOME -->
+        <!-- ========================================================= -->
+        <h:panelGroup rendered="#{userSessionBean.loggedIn}">
+
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="container">
+                    <h1 class="welcome-text">Welcome back, #{userSessionBean.username}</h1>
+                    <p>Your tattoo journey continues. Manage appointments, explore designs, and connect with artists.</p>
+                </div>
+            </div>
+<h:outputText value="Recommended count: #{clientHomeBean.recommendedDesigns.size()}" />
+
+            <!-- Stats Overview -->
+            <section class="section-spacing">
+                <div class="container">
+                    <h2>Your Studio Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">#{clientHomeBean.totalAppointments}</span>
+                            <span class="stat-label">Total Appointments</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">#{clientHomeBean.upcomingAppointmentsCount}</span>
+                            <span class="stat-label">Upcoming</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">#{clientHomeBean.totalFavourites}</span>
+                            <span class="stat-label">Favorites</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">#{clientHomeBean.pendingMedicalForms}</span>
+                            <span class="stat-label">Pending Forms</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upcoming Appointments -->
+            <section class="section-spacing">
+                <div class="container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2>Upcoming Appointments</h2>
+                        <h:link value="View All" outcome="/web/client/appointments.xhtml" styleClass="btn btn-paper"/>
+                    </div>
+                    
+                    <h:panelGroup rendered="#{clientHomeBean.hasUpcomingAppointments()}">
+                        <div style="display: grid; gap: 1.5rem;">
+                            <ui:repeat value="#{clientHomeBean.upcomingAppointments}" var="appointment">
+                                <div class="appointment-card">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                        <div>
+                                            <h4>#{appointment.design.title}</h4>
+                                            <p style="margin: 0.5rem 0;">
+                                                <i class="fas fa-user"></i> Artist: #{appointment.artist.fullName}
+                                            </p>
+                                            <p style="margin: 0.5rem 0;">
+                                                <i class="fas fa-calendar"></i> 
+                                                <h:outputText value="#{appointment.appointmentDateTime}">
+                                                    <f:convertDateTime pattern="EEE, MMM dd, yyyy 'at' hh:mm a"/>
+                                                </h:outputText>
+                                            </p>
+                                        </div>
+                                        <span class="status-badge #{clientHomeBean.getStatusClass(appointment.status)}">
+                                            #{appointment.status}
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; gap: 1rem;">
+                                        <h:link value="View Details" outcome="/web/client/appointmentDetail.xhtml" styleClass="btn btn-ink" style="padding: 0.5rem 1rem;">
+                                            <f:param name="id" value="#{appointment.appointmentId}"/>
+                                        </h:link>
+                                        <h:link value="Medical Form" outcome="/web/client/medicalForm.xhtml" styleClass="btn btn-paper" style="padding: 0.5rem 1rem;"
+                                                rendered="#{appointment.medicalForm == null}">
+                                            <f:param name="appointmentId" value="#{appointment.appointmentId}"/>
+                                        </h:link>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </h:panelGroup>
+                    
+                    <h:panelGroup rendered="#{not clientHomeBean.hasUpcomingAppointments()}">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <h3>No Upcoming Appointments</h3>
+                            <p>Book your first tattoo session to start your ink journey.</p>
+                            <h:link value="Book Appointment" outcome="/web/client/book.xhtml" styleClass="btn btn-gold"/>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </section>
+
+            <!-- Recommended Designs -->
+            <section class="section-spacing">
+                <div class="container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2>Recommended For You</h2>
+                        <h:link value="Browse All" outcome="/web/client/browseDesigns.xhtml" styleClass="btn btn-paper"/>
+                    </div>
+                    
+                    <h:panelGroup rendered="#{clientHomeBean.hasRecommendedDesigns()}">
+                        <div class="designs-grid">
+                            <ui:repeat value="#{clientHomeBean.recommendedDesigns}" var="design">
+                                <div class="design-card">
+                                    <div class="design-image">
+                                        <div class="design-overlay">
+                                            <h:link value="View Design" outcome="/web/client/designDetail.xhtml" styleClass="btn btn-ink">
+                                                <f:param name="id" value="#{design.designId}"/>
+                                            </h:link>
+                                        </div>
+                                    </div>
+                                    <div class="design-content">
+                                        <h4>#{design.title}</h4>
+                                        <p style="flex-grow: 1;">
+                                            <h:outputText value="#{design.description}" rendered="#{design.description != null and design.description.length() gt 80}">
+                                                #{design.description.substring(0,80)}...
+                                            </h:outputText>
+                                            <h:outputText value="#{design.description}" rendered="#{design.description != null and design.description.length() le 80}"/>
+                                        </p>
+                                        <div class="design-meta">
+                                            <span class="design-artist">
+                                                <i class="fas fa-user"></i> #{design.artist.fullName}
+                                            </span>
+                                            <span class="design-price">
+                                                ₹#{design.price != null ? design.price : 'Custom'}
+                                            </span>
+                                        </div>
+                                        <div style="margin-top: 1rem;">
+                                            <span class="style-badge #{clientHomeBean.getStyleClass(design.style)}">
+                                                #{design.style}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </h:panelGroup>
+                    
+                    <h:panelGroup rendered="#{not clientHomeBean.hasRecommendedDesigns()}">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <h3>No Recommendations Yet</h3>
+                            <p>Browse designs and add favorites to get personalized recommendations.</p>
+                            <h:link value="Explore Designs" outcome="/web/client/browseDesigns.xhtml" styleClass="btn btn-gold"/>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </section>
+
+        </h:panelGroup>
+
+        <!-- ========================================================= -->
+        <!-- IF USER NOT LOGGED IN → SHOW PUBLIC HOME -->
+        <!-- ========================================================= -->
+        <h:panelGroup rendered="#{not userSessionBean.loggedIn}">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container">
+                    <div class="hero-section">
+                        <div>
+                            <h1 class="hero-title">Where Skin Becomes Canvas</h1>
+                            <p class="hero-subtitle">
+                                InkFlow Studio brings together award-winning tattoo artists and passionate clients. 
+                                Browse thousands of designs, book appointments online, and begin your tattoo journey.
+                            </p>
+                            
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <h:link value="Book Your Tattoo" outcome="/web/register.xhtml" styleClass="btn btn-gold btn-large">
+                                    <i class="fas fa-calendar-check"></i> Get Started
+                                </h:link>
+                                <h:link value="Browse Designs" outcome="/web/client/browseDesigns.xhtml" styleClass="btn btn-paper btn-large">
+                                    <i class="fas fa-palette"></i> Explore Gallery
+                                </h:link>
+                            </div>
+                        </div>
+                        
+                        <div class="hero-visual">
+                            <div class="hero-image"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Why Choose Us -->
+            <section class="section-spacing">
+                <div class="container">
+                    <h2 class="text-center">Why Choose InkFlow Studio?</h2>
+                    <p class="text-center" style="max-width: 800px; margin: 0 auto 3rem;">
+                        We combine traditional tattoo craftsmanship with modern technology for a seamless experience.
+                    </p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <h3>Certified Artists</h3>
+                            <p>All our artists are certified professionals with specialized training in hygiene and safety.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Medical Safety</h3>
+                            <p>Digital medical forms and strict sterilization protocols ensure your safety.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h3>Easy Booking</h3>
+                            <p>Real-time availability and online booking with instant confirmation.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h3>Client Care</h3>
+                            <p>Personalized aftercare guidance and follow-up support for every tattoo.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Featured Designs -->
+            <section class="section-spacing">
+                <div class="container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2>Featured Tattoo Designs</h2>
+                        <h:link value="View All Designs" outcome="/web/client/browseDesigns.xhtml" styleClass="btn btn-paper"/>
+                    </div>
+                    
+                    <h:panelGroup rendered="#{showcaseBean.hasDesigns()}">
+                        <div class="designs-grid">
+                            <ui:repeat value="#{showcaseBean.featuredDesigns}" var="design">
+                                <div class="design-card">
+                                    <div class="design-image">
+                                        <div class="design-overlay">
+                                            <h:link value="Login to View" outcome="/web/login.xhtml" styleClass="btn btn-ink">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </h:link>
+                                        </div>
+                                    </div>
+                                    <div class="design-content">
+                                        <h4>#{design.title}</h4>
+                                        <p style="flex-grow: 1;">
+                                            <h:outputText value="#{design.description}" rendered="#{design.description != null and design.description.length() gt 80}">
+                                                #{design.description.substring(0,80)}...
+                                            </h:outputText>
+                                            <h:outputText value="#{design.description}" rendered="#{design.description != null and design.description.length() le 80}"/>
+                                        </p>
+                                        <div class="design-meta">
+                                            <span class="design-artist">
+                                                <i class="fas fa-user"></i> #{design.artist.fullName}
+                                            </span>
+                                            <span class="design-price">
+                                                ₹#{design.price != null ? design.price : 'Custom'}
+                                            </span>
+                                        </div>
+                                        <div style="margin-top: 1rem;">
+                                            <span class="style-badge #{clientHomeBean.getStyleClass(design.style)}">
+                                                #{design.style}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                        </div>
+                    </h:panelGroup>
+                    
+                    <h:panelGroup rendered="#{not showcaseBean.hasDesigns()}">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <h3>No Designs Available</h3>
+                            <p>Our artists are creating new designs. Check back soon!</p>
+                        </div>
+                    </h:panelGroup>
+                </div>
+            </section>
+
+            <!-- Styles We Offer -->
+            <section class="section-spacing">
+                <div class="container">
+                    <h2 class="text-center">Tattoo Styles We Master</h2>
+                    <p class="text-center" style="max-width: 800px; margin: 0 auto 3rem;">
+                        From traditional to modern, our artists specialize in various tattoo styles.
+                    </p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <ui:repeat value="#{showcaseBean.availableStyles}" var="style">
+                            <span class="style-badge #{clientHomeBean.getStyleClass(style)}" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                                #{style}
+                            </span>
+                        </ui:repeat>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="container">
+                    <h2 class="cta-title">Ready to Start Your Tattoo Journey?</h2>
+                    <p style="max-width: 600px; margin: 0 auto 2rem; color: rgba(255, 255, 255, 0.9);">
+                        Join thousands of satisfied clients who found their perfect tattoo at InkFlow Studio.
+                    </p>
+                    
+                    <div class="cta-buttons">
+                        <h:link value="Create Free Account" outcome="/web/register.xhtml" styleClass="btn btn-gold btn-large">
+                            <i class="fas fa-user-plus"></i> Sign Up Free
+                        </h:link>
+                        <h:link value="Browse Artists" outcome="/web/client/browseArtists.xhtml" styleClass="btn btn-paper btn-large">
+                            <i class="fas fa-users"></i> Meet Our Artists
+                        </h:link>
+                    </div>
+                </div>
+            </section>
+
+        </h:panelGroup>
+
+    </ui:define>
+</ui:composition>

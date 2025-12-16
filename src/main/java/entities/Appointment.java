@@ -3,6 +3,7 @@ package entities;
 import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,11 +29,22 @@ public class Appointment implements Serializable {
     
     // FIX: Added missing link to TimeSlot to resolve 'cannot find symbol: method getSlot()'
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SLOT_ID", unique = true, nullable = false)
+    @JoinColumn(name = "SLOT_ID", unique = true, nullable = true)
     private TimeSlot slot; 
 
-    @Column(name = "APPOINTMENTDATETIME", nullable = false)
+    @Column(name = "APPOINTMENTDATETIME", nullable = true)
     private LocalDateTime appointmentDateTime; // Redundant but useful for query/display
+    
+    @Column(name = "REQUEST_DATETIME", nullable = false, updatable = false)
+    private LocalDateTime requestDateTime;
+
+    public LocalDateTime getRequestDateTime() {
+        return requestDateTime;
+    }
+
+    public void setRequestDateTime(LocalDateTime requestDateTime) {
+        this.requestDateTime = requestDateTime;
+    }
 
     @Column(name = "STATUS", nullable = false, length = 50)
     private String status; // PENDING, CONFIRMED, COMPLETED, CANCELLED
@@ -78,6 +90,15 @@ public class Appointment implements Serializable {
 
     public Appointment() {}
 
+    
+    @Column(name = "CLIENT_PREFERRED_DATE")
+private LocalDate clientPreferredDate; // Client's preferred date (optional)
+
+// Add getter and setter (around line 120-130, with other getters/setters)
+public LocalDate getClientPreferredDate() { return clientPreferredDate; }
+public void setClientPreferredDate(LocalDate clientPreferredDate) { this.clientPreferredDate = clientPreferredDate; }
+
+
     // Getters and Setters
     public Long getAppointmentId() { return appointmentId; }
     public void setAppointmentId(Long appointmentId) { this.appointmentId = appointmentId; }
@@ -113,5 +134,18 @@ public class Appointment implements Serializable {
     
     public Feedback getFeedback() { return feedback; }
     public void setFeedback(Feedback feedback) { this.feedback = feedback; }
+
+    public enum AppointmentStatus {
+    PENDING,
+    CONFIRMED,
+    COMPLETED,
+    CANCELLED,
+    PAID;
+
+    // helper to convert String -> Enum
+    public static AppointmentStatus fromString(String status) {
+        return AppointmentStatus.valueOf(status.toUpperCase());
+    }
+}
 
 }

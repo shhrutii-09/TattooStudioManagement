@@ -9,24 +9,50 @@
         </div>
 
         <nav class="nav-list">
-            <h:link outcome="dashboard.xhtml" styleClass="nav-item">
-                <i class="pi pi-home"></i><span>Dashboard</span>
-            </h:link>
-            <h:link outcome="users.xhtml" styleClass="nav-item">
-                <i class="pi pi-users"></i><span>Users</span>
-            </h:link>
-            <h:link outcome="artists.xhtml" styleClass="nav-item">
-                <i class="pi pi-id-card"></i><span>Artists</span>
-            </h:link>
-            <h:link outcome="designs.xhtml" styleClass="nav-item">
-                <i class="pi pi-image"></i><span>Designs</span>
-            </h:link>
-            <h:link outcome="appointments.xhtml" styleClass="nav-item">
-                <i class="pi pi-calendar"></i><span>Appointments</span>
-            </h:link>
-            <h:link outcome="payments.xhtml" styleClass="nav-item">
-                <i class="pi pi-wallet"></i><span>Payments</span>
-            </h:link>
+            <!-- Only show admin navigation if user is admin -->
+            <ui:fragment rendered="#{userSessionBean.admin}">
+
+                <h:link outcome="dashboard.xhtml" styleClass="nav-item">
+                    <i class="pi pi-home"></i><span>Dashboard</span>
+                </h:link>
+
+                <h:link outcome="users.xhtml" styleClass="nav-item">
+                    <i class="pi pi-users"></i><span>Users</span>
+                </h:link>
+
+                <h:link outcome="artists.xhtml" styleClass="nav-item">
+                    <i class="pi pi-id-card"></i><span>Artists</span>
+                </h:link>
+
+                <h:link outcome="design-management.xhtml" styleClass="nav-item">
+                    <i class="pi pi-images"></i><span>Designs Management</span>
+                </h:link>
+
+<!--                <h:link outcome="appointments.xhtml" styleClass="nav-item">
+                    <i class="pi pi-calendar-clock"></i><span>Appointments</span>
+                </h:link>-->
+
+                <h:link outcome="artist-payouts.xhtml" styleClass="nav-item">
+                    <i class="pi pi-money-bill"></i><span>Artist Payouts</span>
+                </h:link>
+
+                <h:link outcome="admin-earnings.xhtml" styleClass="nav-item">
+                    <i class="pi pi-chart-line"></i><span>System Earnings</span>
+                </h:link>
+
+                <h:link outcome="medicalForms.xhtml" styleClass="nav-item">
+                    <i class="pi pi-file"></i><span>Medical Form Manage</span>
+                </h:link>
+
+            </ui:fragment>
+
+            <!-- Show message if not admin -->
+            <ui:fragment rendered="#{not userSessionBean.admin and userSessionBean.loggedIn}">
+                <div style="padding: 20px; text-align: center; color: #95a5a6;">
+                    <i class="pi pi-lock" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>Admin access required</p>
+                </div>
+            </ui:fragment>
         </nav>
 
         <div class="sidebar-bottom">
